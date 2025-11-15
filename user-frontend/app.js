@@ -224,6 +224,12 @@ function backToHubs() {
     currentHub = null;
     allWorkspaces = [];
     
+    // Clear the workspaces grid
+    const workspacesGrid = document.getElementById('workspaces-grid');
+    if (workspacesGrid) {
+        workspacesGrid.innerHTML = '';
+    }
+    
     // Reset all workspace filters
     document.getElementById('filter-type').value = '';
     document.getElementById('filter-capacity').value = '';
