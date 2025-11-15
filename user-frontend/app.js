@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup booking form
     document.getElementById('booking-form').addEventListener('submit', handleBookingSubmit);
+    
+    // Add event listeners for dynamic pricing when dates/booking type change
+    document.getElementById('start-time').addEventListener('change', updatePricingSummary);
+    document.getElementById('end-time').addEventListener('change', updatePricingSummary);
+    document.getElementById('booking-type').addEventListener('change', updatePricingSummary);
 });
 
 // Navigation
@@ -511,11 +516,11 @@ async function checkWorkspaceBookingStatus(workspaceId) {
         
         if (result.success && result.data) {
             const now = new Date();
-            // Check for confirmed/checked-in bookings that haven't ended yet
+            // Check for confirmed/checked-in bookings that haven't ended yet (cancelled bookings are automatically excluded)
             const activeBooking = result.data.find(booking => {
                 const startTime = new Date(booking.start_time);
                 const endTime = new Date(booking.end_time);
-                // Show as booked if the booking hasn't ended yet
+                // Show as booked if the booking hasn't ended yet and status is confirmed or checked_in
                 const hasNotEnded = endTime > now;
                 const isBooked = (booking.status === 'confirmed' || booking.status === 'checked_in') && hasNotEnded;
                 
@@ -599,8 +604,11 @@ async function openBookingModal(workspaceId) {
                         <p>${resource.description}</p>
                     </div>
                     <div class="resource-select">
-                        <span class="resource-price">₹${resource.price_per_slot}</span>
-                        <input type="checkbox" onchange="toggleResource(${resource.id}, ${resource.price_per_slot})">
+                        <span class="resource-price">₹${resource.price_per_slot}/hour</span>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="number" id="qty-${resource.id}" min="0" value="0" style="width: 60px; padding: 0.25rem; border: 1px solid var(--border); border-radius: 4px; text-align: center;" onchange="updateResourceQuantity(${resource.id}, ${resource.price_per_slot}, '${resource.name}')">
+                            <label for="qty-${resource.id}" style="font-size: 0.85rem; color: var(--text-light);">Qty</label>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -625,12 +633,22 @@ function closeBookingModal() {
     document.getElementById('booking-modal').classList.remove('active');
 }
 
-function toggleResource(resourceId, price) {
+function updateResourceQuantity(resourceId, price, name) {
+    const quantity = parseInt(document.getElementById(`qty-${resourceId}`).value) || 0;
     const index = selectedResources.findIndex(r => r.id === resourceId);
-    if (index > -1) {
-        selectedResources.splice(index, 1);
+    
+    if (quantity === 0) {
+        // Remove resource if quantity is 0
+        if (index > -1) {
+            selectedResources.splice(index, 1);
+        }
     } else {
-        selectedResources.push({ id: resourceId, price });
+        // Add or update resource with quantity
+        if (index > -1) {
+            selectedResources[index].quantity = quantity;
+        } else {
+            selectedResources.push({ id: resourceId, price, quantity, name });
+        }
     }
     updatePricingSummary();
 }
@@ -642,7 +660,7 @@ function updatePricingSummary() {
     
     if (!currentWorkspace || !startTime || !endTime) {
         const basePrice = currentWorkspace ? currentWorkspace.base_price : 0;
-        const resourcesPrice = selectedResources.reduce((sum, r) => sum + r.price, 0);
+        const resourcesPrice = selectedResources.reduce((sum, r) => sum + (r.price * r.quantity), 0);
         const totalPrice = basePrice + resourcesPrice;
         
         document.getElementById('base-price').textContent = `₹${basePrice}`;
@@ -670,7 +688,7 @@ function updatePricingSummary() {
                 const start = new Date(startTime);
                 const end = new Date(endTime);
                 const hours = (end - start) / (1000 * 60 * 60);
-                return sum + (r.price * hours);
+                return sum + (r.price * r.quantity * hours);
             }, 0);
             
             const totalPrice = pricing.final_price + resourcesPrice;
@@ -749,11 +767,39 @@ function updatePricingSummary() {
                 priceHTML += `</div>`;
             }
             
+            // Display resources breakdown
+            if (selectedResources.length > 0) {
+                priceHTML += `
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                        <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--primary); font-size: 0.9rem;">
+                            <i class="fas fa-plus-circle"></i> Additional Resources:
+                        </div>
+                `;
+                
+                const start = new Date(startTime);
+                const end = new Date(endTime);
+                const hours = (end - start) / (1000 * 60 * 60);
+                
+                selectedResources.forEach(resource => {
+                    const resourceTotal = resource.price * resource.quantity * hours;
+                    priceHTML += `
+                        <div class="price-row" style="font-size: 0.875rem; margin-left: 1rem;">
+                            <span>${resource.name} <span style="color: var(--text-light);">(${resource.quantity} × ₹${resource.price} × ${hours}h)</span></span>
+                            <span>₹${resourceTotal.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+                
+                priceHTML += `
+                        <div class="price-row" style="font-weight: 600; margin-top: 0.5rem;">
+                            <span>Resources Subtotal:</span>
+                            <span id="resources-price">₹${resourcesPrice.toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
             priceHTML += `
-                <div class="price-row" style="margin-top: 1rem;">
-                    <span>Additional Resources:</span>
-                    <span id="resources-price">₹${resourcesPrice.toFixed(2)}</span>
-                </div>
                 <div class="price-row total" style="font-size: 1.25rem; padding-top: 1rem; border-top: 2px solid var(--border);">
                     <span><i class="fas fa-money-bill-wave"></i> Total Amount:</span>
                     <span id="total-price">₹${totalPrice.toFixed(2)}</span>
@@ -1056,8 +1102,9 @@ async function cancelBooking(bookingId) {
             loadMyBookings();
             
             // Reload workspaces if on search page to update booking status
-            if (currentHub && allWorkspaces.length > 0) {
-                displayWorkspaces(allWorkspaces);
+            if (currentHub) {
+                // Reload the hub's workspaces to refresh booking status
+                selectHub(currentHub.id);
             }
         } else {
             alert('Error cancelling booking: ' + (result.error || 'Unknown error'));
