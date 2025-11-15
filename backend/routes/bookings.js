@@ -85,52 +85,73 @@ router.post('/', async (req, res) => {
     const {
       workspace_id,
       user_name,
+      user_email,
       start_time,
       end_time,
+      total_price,
       booking_type,
+      status,
       resources // Array of { resource_id, quantity }
     } = req.body;
 
-    // Get workspace details
+    // Validate required fields
+    if (!workspace_id || !user_name || !start_time || !end_time) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Missing required fields' 
+      });
+    }
+
+    // Get workspace details to validate it exists
     const { data: workspace, error: workspaceError } = await supabase
       .from('workspaces')
       .select('*')
       .eq('id', workspace_id)
       .single();
 
-    if (workspaceError) throw workspaceError;
-
-    // Calculate duration in hours
-    const start = new Date(start_time);
-    const end = new Date(end_time);
-    const durationHours = (end - start) / (1000 * 60 * 60);
-
-    // Calculate dynamic price
-    const dynamicPrice = await calculateDynamicPrice(
-      workspace_id,
-      workspace.base_price,
-      start_time,
-      durationHours,
-      booking_type
-    );
-
-    // Calculate resource costs
-    let resourceCost = 0;
-    if (resources && resources.length > 0) {
-      for (const res of resources) {
-        const { data: resourceData } = await supabase
-          .from('resources')
-          .select('price_per_slot')
-          .eq('id', res.resource_id)
-          .single();
-        
-        if (resourceData) {
-          resourceCost += resourceData.price_per_slot * res.quantity;
-        }
-      }
+    if (workspaceError || !workspace) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Workspace not found' 
+      });
     }
 
-    const total_price = dynamicPrice + resourceCost;
+    // Use provided total_price or calculate if not provided
+    let finalPrice = total_price;
+    
+    if (!finalPrice) {
+      // Calculate duration in hours
+      const start = new Date(start_time);
+      const end = new Date(end_time);
+      const durationHours = (end - start) / (1000 * 60 * 60);
+
+      // Calculate dynamic price
+      const dynamicPrice = await calculateDynamicPrice(
+        workspace_id,
+        workspace.base_price,
+        start_time,
+        durationHours,
+        booking_type
+      );
+
+      // Calculate resource costs
+      let resourceCost = 0;
+      if (resources && resources.length > 0) {
+        for (const res of resources) {
+          const { data: resourceData } = await supabase
+            .from('resources')
+            .select('price_per_slot')
+            .eq('id', res.resource_id)
+            .single();
+          
+          if (resourceData) {
+            resourceCost += resourceData.price_per_slot * res.quantity;
+          }
+        }
+      }
+
+      finalPrice = dynamicPrice + resourceCost;
+    }
 
     // Create booking
     const { data: booking, error: bookingError } = await supabase
@@ -140,9 +161,9 @@ router.post('/', async (req, res) => {
         user_name,
         start_time,
         end_time,
-        total_price,
-        booking_type,
-        status: 'confirmed'
+        total_price: finalPrice,
+        booking_type: booking_type || 'hourly',
+        status: status || 'confirmed'
       }])
       .select()
       .single();

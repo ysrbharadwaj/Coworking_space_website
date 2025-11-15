@@ -17,6 +17,10 @@ async function clearDatabase() {
     await supabase.from('qr_codes').delete().neq('id', 0);
     console.log('✅ QR codes deleted\n');
 
+    console.log('Deleting ratings...');
+    await supabase.from('ratings').delete().neq('id', 0);
+    console.log('✅ Ratings deleted\n');
+
     console.log('Deleting booking resources...');
     await supabase.from('booking_resources').delete().neq('id', 0);
     console.log('✅ Booking resources deleted\n');

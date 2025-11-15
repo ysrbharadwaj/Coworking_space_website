@@ -156,6 +156,26 @@ async function populateDatabase() {
     }
     console.log(`✅ Generated ${qrs.length} QR codes\n`);
 
+    // 7. Insert Ratings
+    console.log('⭐ Inserting ratings...');
+    const ratingsWithWorkspaceIds = dummyData.ratings.map(rating => ({
+      workspace_id: workspaceMap[rating.workspace_name],
+      user_name: rating.user_name,
+      rating: rating.rating,
+      review: rating.review
+    }));
+
+    const { data: ratings, error: ratingsError } = await supabase
+      .from('ratings')
+      .insert(ratingsWithWorkspaceIds)
+      .select();
+
+    if (ratingsError) {
+      console.error('Error inserting ratings:', ratingsError);
+      return;
+    }
+    console.log(`✅ Inserted ${ratings.length} ratings\n`);
+
     console.log('🎉 Database population completed successfully!\n');
     console.log('Summary:');
     console.log(`  - ${hubs.length} Working Hubs`);
@@ -164,6 +184,7 @@ async function populateDatabase() {
     console.log(`  - ${pricingRules.length} Pricing Rules`);
     console.log(`  - ${bookings.length} Sample Bookings`);
     console.log(`  - ${qrs.length} QR Codes`);
+    console.log(`  - ${ratings.length} Ratings`);
 
   } catch (error) {
     console.error('❌ Error populating database:', error);

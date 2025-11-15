@@ -147,6 +147,24 @@
       "capacity": 40,
       "base_price": 2000,
       "amenities": ["Wi-Fi", "AC", "Projector", "Video Conferencing", "Catering", "Whiteboard", "Parking"]
+    },
+    {
+      "hub_name": "Tech Hub Downtown",
+      "name": "Premium Cabin (Under Maintenance)",
+      "type": "cabin",
+      "capacity": 4,
+      "base_price": 450,
+      "is_available": false,
+      "amenities": ["Wi-Fi", "AC", "Ergonomic Chair", "Standing Desk", "Locker"]
+    },
+    {
+      "hub_name": "Business Center Delhi",
+      "name": "VIP Meeting Room (Booked)",
+      "type": "meeting_room",
+      "capacity": 15,
+      "base_price": 800,
+      "is_available": false,
+      "amenities": ["Wi-Fi", "AC", "Projector", "Video Conferencing", "Whiteboard", "Coffee"]
     }
   ],
   "resources": [
@@ -308,6 +326,104 @@
       "end_time": "2025-11-15T17:00:00",
       "booking_type": "daily",
       "status": "checked_in"
+    }
+  ],
+  "ratings": [
+    {
+      "workspace_name": "Conference Room A",
+      "user_name": "Rahul Sharma",
+      "rating": 5,
+      "review": "Excellent meeting room with great amenities. The projector quality was outstanding!"
+    },
+    {
+      "workspace_name": "Conference Room A",
+      "user_name": "Priya Patel",
+      "rating": 4,
+      "review": "Good space, very professional environment."
+    },
+    {
+      "workspace_name": "Executive Suite",
+      "user_name": "Amit Kumar",
+      "rating": 5,
+      "review": "Perfect for client meetings. Premium quality and service."
+    },
+    {
+      "workspace_name": "Executive Suite",
+      "user_name": "Sneha Reddy",
+      "rating": 5,
+      "review": "Absolutely loved the conference setup. Will book again!"
+    },
+    {
+      "workspace_name": "Executive Suite",
+      "user_name": "Vikram Singh",
+      "rating": 4,
+      "review": "Great location and facilities. Slightly expensive but worth it."
+    },
+    {
+      "workspace_name": "Board Room",
+      "user_name": "Anita Desai",
+      "rating": 5,
+      "review": "Top-notch boardroom. Impressed all our stakeholders."
+    },
+    {
+      "workspace_name": "Board Room",
+      "user_name": "Rohan Mehta",
+      "rating": 5,
+      "review": "Professional setup with excellent support staff."
+    },
+    {
+      "workspace_name": "Hot Desk Area",
+      "user_name": "Kavita Iyer",
+      "rating": 4,
+      "review": "Good for daily work. WiFi is fast and coffee is great!"
+    },
+    {
+      "workspace_name": "Hot Desk Area",
+      "user_name": "Arjun Nair",
+      "rating": 4,
+      "review": "Comfortable workspace with good amenities."
+    },
+    {
+      "workspace_name": "Private Cabin 1",
+      "user_name": "Neha Gupta",
+      "rating": 4,
+      "review": "Nice private space for focused work."
+    },
+    {
+      "workspace_name": "Private Cabin 1",
+      "user_name": "Sanjay Kumar",
+      "rating": 3,
+      "review": "Good but could use better lighting."
+    },
+    {
+      "workspace_name": "Collaboration Zone",
+      "user_name": "Meera Shah",
+      "rating": 5,
+      "review": "Perfect for team brainstorming sessions!"
+    },
+    {
+      "workspace_name": "Collaboration Zone",
+      "user_name": "Karthik Reddy",
+      "rating": 4,
+      "review": "Great collaborative environment."
+    },
+    {
+      "workspace_name": "Team Room B",
+      "user_name": "Deepa Krishnan",
+      "rating": 4,
+      "review": "Good team workspace with all necessary facilities."
+    },
+    {
+      "workspace_name": "Conference Hall",
+      "user_name": "Rajesh Patel",
+      "rating": 5,
+      "review": "Huge space, perfect for our annual meeting. Highly recommended!"
+    },
+    {
+      "workspace_name": "Conference Hall",
+      "user_name": "Lakshmi Iyer",
+      "rating": 5,
+      "review": "Exceptional venue for large gatherings."
     }
   ]
 }

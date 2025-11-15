@@ -38,18 +38,8 @@
                                 <option value="">Select City</option>
                             </select>
                         </div>
-                        <div class="search-group">
-                            <i class="fas fa-briefcase"></i>
-                            <select id="hero-type">
-                                <option value="">Workspace Type</option>
-                                <option value="hotdesk">Hot Desk</option>
-                                <option value="cabin">Private Cabin</option>
-                                <option value="meeting_room">Meeting Room</option>
-                                <option value="conference">Conference Hall</option>
-                            </select>
-                        </div>
                         <button class="btn-primary" onclick="searchFromHero()">
-                            <i class="fas fa-search"></i> Search
+                            <i class="fas fa-search"></i> Find Hubs
                         </button>
                     </div>
                 </div>
@@ -90,46 +80,88 @@
         <div class="container">
             <div class="page-header">
                 <h1>Find Your Space</h1>
-                <p>Search and filter available workspaces</p>
+                <p>Select a hub to view available workspaces</p>
             </div>
 
-            <div class="search-filters">
-                <div class="filter-group">
-                    <label>City</label>
-                    <select id="filter-city">
-                        <option value="">All Cities</option>
-                    </select>
+            <!-- Hubs Section -->
+            <div id="hubs-section">
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <label>City</label>
+                        <select id="filter-city" onchange="filterHubs()">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Search Hub</label>
+                        <input type="text" id="search-hub" placeholder="Search by hub name..." oninput="filterHubs()">
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label>Workspace Type</label>
-                    <select id="filter-type">
-                        <option value="">All Types</option>
-                        <option value="hotdesk">Hot Desk</option>
-                        <option value="cabin">Private Cabin</option>
-                        <option value="meeting_room">Meeting Room</option>
-                        <option value="conference">Conference Hall</option>
-                    </select>
+
+                <h2 style="margin: 2rem 0 1rem; color: var(--primary);">Available Hubs</h2>
+                <div id="hubs-grid" class="hubs-grid">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading hubs...</p>
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label>Capacity</label>
-                    <select id="filter-capacity">
-                        <option value="">Any</option>
-                        <option value="1-5">1-5 people</option>
-                        <option value="6-10">6-10 people</option>
-                        <option value="11-20">11-20 people</option>
-                        <option value="21+">21+ people</option>
-                    </select>
-                </div>
-                <button class="btn-secondary" onclick="searchWorkspaces()">
-                    <i class="fas fa-filter"></i> Apply Filters
-                </button>
             </div>
 
-            <div id="workspaces-grid" class="workspaces-grid">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading workspaces...</p>
+            <!-- Workspaces Section (Hidden initially) -->
+            <div id="workspaces-section" style="display: none;">
+                <div class="hub-header">
+                    <div class="hub-header-info">
+                        <h2 id="selected-hub-name">Workspaces</h2>
+                        <p id="selected-hub-address"></p>
+                    </div>
+                    <button class="btn-secondary" onclick="backToHubs()">
+                        <i class="fas fa-arrow-left"></i> Back to Hubs
+                    </button>
                 </div>
+                
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <label>Workspace Type</label>
+                        <select id="filter-type" onchange="filterWorkspaces()">
+                            <option value="">All Types</option>
+                            <option value="hotdesk">Hot Desk</option>
+                            <option value="cabin">Private Cabin</option>
+                            <option value="meeting_room">Meeting Room</option>
+                            <option value="conference">Conference Hall</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Capacity</label>
+                        <select id="filter-capacity" onchange="filterWorkspaces()">
+                            <option value="">Any</option>
+                            <option value="1-5">1-5 people</option>
+                            <option value="6-10">6-10 people</option>
+                            <option value="11-20">11-20 people</option>
+                            <option value="21+">21+ people</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Availability</label>
+                        <select id="filter-availability" onchange="filterWorkspaces()">
+                            <option value="">All</option>
+                            <option value="available">Available Only</option>
+                            <option value="unavailable">Unavailable</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sort-by" onchange="filterWorkspaces()">
+                            <option value="">Default</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="capacity-low">Capacity: Low to High</option>
+                            <option value="capacity-high">Capacity: High to Low</option>
+                        </select>
+                    </div>
+                    </div>
+                </div>
+
+                <div id="workspaces-grid" class="workspaces-grid"></div>
             </div>
         </div>
     </section>
@@ -213,9 +245,11 @@
             </div>
             <div class="modal-body">
                 <div class="payment-amount">
-                    <span>Amount to Pay</span>
+                    <span>Total Amount</span>
                     <h2 id="payment-amount">₹0</h2>
                 </div>
+
+                <div id="payment-breakdown" style="margin-bottom: 2rem;"></div>
 
                 <div class="payment-methods">
                     <div class="payment-method" onclick="selectPayment('card')">

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
+const { calculateDynamicPrice } = require('../utils/pricing');
 
 // Get all pricing rules
 router.get('/', async (req, res) => {
@@ -128,7 +129,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Calculate price for a booking
+// Calculate price for a booking with dynamic pricing
 router.post('/calculate', async (req, res) => {
   try {
     const { workspace_id, start_time, end_time, booking_type } = req.body;
@@ -142,76 +143,25 @@ router.post('/calculate', async (req, res) => {
 
     if (workspaceError) throw workspaceError;
 
-    // Calculate duration
-    const start = new Date(start_time);
-    const end = new Date(end_time);
-    const durationHours = (end - start) / (1000 * 60 * 60);
-
-    // Base price calculation
-    let basePrice = workspace.base_price;
-    if (booking_type === 'daily') {
-      basePrice *= 8; // 8 hours per day
-    } else if (booking_type === 'monthly') {
-      basePrice *= 8 * 22; // 8 hours * 22 working days
-    } else {
-      basePrice *= durationHours;
-    }
-
-    // Get applicable pricing rules
-    const { data: rules, error: rulesError } = await supabase
-      .from('pricing_rules')
-      .select('*')
-      .eq('workspace_id', workspace_id);
-
-    if (rulesError) throw rulesError;
-
-    // Apply pricing rules
-    let finalPrice = basePrice;
-    const appliedRules = [];
-
-    for (const rule of rules) {
-      let applies = false;
-
-      // Check if rule applies based on time and day
-      const bookingDay = start.toLocaleDateString('en-US', { weekday: 'short' });
-      
-      if (rule.days && rule.days.length > 0) {
-        if (rule.days.includes(bookingDay)) {
-          applies = true;
-        }
-      } else if (rule.rule_type === 'demand') {
-        // Calculate occupancy for demand-based pricing
-        const { data: bookings } = await supabase
-          .from('bookings')
-          .select('*')
-          .eq('workspace_id', workspace_id)
-          .eq('status', 'confirmed')
-          .gte('start_time', start.toISOString().split('T')[0])
-          .lte('start_time', end.toISOString().split('T')[0]);
-
-        const occupancyRate = (bookings?.length || 0) / 10; // Assuming max 10 slots per day
-        
-        if (occupancyRate > 0.7) {
-          applies = true;
-        } else if (occupancyRate < 0.3) {
-          applies = true;
-        }
-      }
-
-      if (applies) {
-        finalPrice += (finalPrice * (rule.percentage_modifier || 0) / 100);
-        finalPrice += (rule.flat_modifier || 0);
-        appliedRules.push(rule);
-      }
-    }
+    // Use enhanced dynamic pricing
+    const pricingResult = await calculateDynamicPrice(
+      workspace_id,
+      workspace.base_price,
+      start_time,
+      end_time,
+      booking_type
+    );
 
     res.json({
       success: true,
       data: {
-        base_price: basePrice,
-        final_price: Math.round(finalPrice * 100) / 100,
-        duration_hours: durationHours,
-        applied_rules: appliedRules
+        workspace_name: workspace.name,
+        base_price: workspace.base_price,
+        final_price: pricingResult.finalPrice,
+        breakdown: pricingResult.breakdown,
+        occupancy_rate: pricingResult.occupancyRate,
+        is_workday: pricingResult.isWorkday,
+        booking_type
       }
     });
   } catch (error) {
