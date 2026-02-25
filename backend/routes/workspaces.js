@@ -6,7 +6,7 @@ const { supabase } = require('../config/supabase');
 router.get('/', async (req, res) => {
   try {
     const { hub_id, type, min_capacity, max_capacity, min_price, max_price, city, state } = req.query;
-    
+
     let query = supabase
       .from('workspaces')
       .select(`
@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 router.get('/search', async (req, res) => {
   try {
     const { amenity, sort_by } = req.query;
-    
+
     let query = supabase
       .from('workspaces')
       .select(`
@@ -71,7 +71,7 @@ router.get('/search', async (req, res) => {
     if (error) throw error;
 
     let filteredData = data;
-    
+
     // Filter by amenity
     if (amenity) {
       filteredData = filteredData.filter(workspace => {
@@ -120,55 +120,55 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// // Create workspace (Admin)
-// router.post('/', async (req, res) => {
-//   try {
-//     const { hub_id, name, type, capacity, base_price, amenities } = req.body;
-    
-//     const { data, error } = await supabase
-//       .from('workspaces')
-//       .insert([{ hub_id, name, type, capacity, base_price, amenities: amenities || [] }])
-//       .select();
+// Create workspace (Admin)
+router.post('/', async (req, res) => {
+  try {
+    const { hub_id, name, type, capacity, base_price, amenities } = req.body;
 
-//     if (error) throw error;
-//     res.json({ success: true, data });
-//   } catch (error) {
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// });
-// 
-// // Update workspace (Admin)
-// router.put('/:id', async (req, res) => {
-//   try {
-//     const { hub_id, name, type, capacity, base_price, amenities } = req.body;
-    
-//     const { data, error } = await supabase
-//       .from('workspaces')
-//       .update({ hub_id, name, type, capacity, base_price, amenities })
-//       .eq('id', req.params.id)
-//       .select();
-// 
-//     if (error) throw error;
-//     res.json({ success: true, data });
-//   } catch (error) {
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// });
-// 
-// // Delete workspace (Admin)
-// router.delete('/:id', async (req, res) => {
-//   try {
-//     const { error } = await supabase
-//       .from('workspaces')
-//       .delete()
-//       .eq('id', req.params.id);
-// 
-//     if (error) throw error;
-//     res.json({ success: true, message: 'Workspace deleted successfully' });
-//   } catch (error) {
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// });
+    const { data, error } = await supabase
+      .from('workspaces')
+      .insert([{ hub_id, name, type, capacity, base_price, amenities: amenities || [] }])
+      .select();
+
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update workspace (Admin)
+router.put('/:id', async (req, res) => {
+  try {
+    const { hub_id, name, type, capacity, base_price, amenities } = req.body;
+
+    const { data, error } = await supabase
+      .from('workspaces')
+      .update({ hub_id, name, type, capacity, base_price, amenities })
+      .eq('id', req.params.id)
+      .select();
+
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete workspace (Admin)
+router.delete('/:id', async (req, res) => {
+  try {
+    const { error } = await supabase
+      .from('workspaces')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
+    res.json({ success: true, message: 'Workspace deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Check availability for a workspace
 router.post('/:id/check-availability', async (req, res) => {
@@ -193,7 +193,7 @@ router.post('/:id/check-availability', async (req, res) => {
     const isAvailable = !bookings.some(booking => {
       const bookingStart = new Date(booking.start_time);
       const bookingEnd = new Date(booking.end_time);
-      
+
       return (
         (requestedStart >= bookingStart && requestedStart < bookingEnd) ||
         (requestedEnd > bookingStart && requestedEnd <= bookingEnd) ||

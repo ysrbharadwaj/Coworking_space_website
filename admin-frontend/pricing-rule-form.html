@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <main class="admin-main">
         <header class="admin-header">
@@ -24,48 +26,70 @@
                     <form id="pricing-rule-form" novalidate>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="name">Rule Name <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="name" placeholder="e.g. Weekend Surge"
-                                    data-validate="required|minlen:3" data-label="Rule Name">
+                                <label for="workspace_id">Workspace <span style="color:var(--danger)">*</span></label>
+                                <select id="workspace_id" name="workspace_id" required>
+                                    <option value="">-- Select Workspace --</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="rule-type">Rule Type <span style="color:var(--danger)">*</span></label>
-                                <select id="rule-type" data-validate="required" data-label="Rule Type">
+                                <label for="rule_type">Rule Type <span style="color:var(--danger)">*</span></label>
+                                <select id="rule_type" name="rule_type" required>
                                     <option value="">-- Select Type --</option>
                                     <option value="peak_hours">Peak Hours</option>
                                     <option value="weekend">Weekend</option>
-                                    <option value="bulk">Bulk Discount</option>
-                                    <option value="early_bird">Early Bird</option>
-                                    <option value="occupancy">Occupancy Based</option>
-                                    <option value="rating">Rating Based</option>
+                                    <option value="demand">High Demand</option>
+                                    <option value="time_based">Time Based</option>
+                                    <option value="day_based">Day Based</option>
+                                    <option value="custom">Custom</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="modifier-percent">Modifier (%) <span style="color:var(--danger)">*</span></label>
-                                <input type="number" id="modifier-percent" step="0.1"
-                                    placeholder="e.g. 15 for +15%, -10 for discount"
-                                    data-validate="required" data-label="Modifier">
-                                <span class="form-hint">Positive = surcharge, Negative = discount</span>
+                                <label for="percentage_modifier">Percentage Modifier (%)</label>
+                                <input type="number" id="percentage_modifier" name="percentage_modifier" step="0.1"
+                                    placeholder="e.g. 15 for +15%, -10 for -10%">
+                                <span class="form-hint">Positive = increase, Negative = discount</span>
                             </div>
                             <div class="form-group">
-                                <label for="is-active">Status</label>
-                                <select id="is-active">
-                                    <option value="true">Active</option>
-                                    <option value="false">Inactive</option>
-                                </select>
+                                <label for="flat_modifier">Flat Modifier (₹)</label>
+                                <input type="number" id="flat_modifier" name="flat_modifier" step="0.01"
+                                    placeholder="e.g. 200 for +₹200, -100 for -₹100">
+                                <span class="form-hint">Fixed amount to add/subtract</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="start_time">Start Time (Optional)</label>
+                                <input type="time" id="start_time" name="start_time" placeholder="09:00">
+                                <span class="form-hint">When rule starts applying</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="end_time">End Time (Optional)</label>
+                                <input type="time" id="end_time" name="end_time" placeholder="17:00">
+                                <span class="form-hint">When rule stops applying</span>
                             </div>
                             <div class="form-group full">
-                                <label for="description">Description</label>
-                                <textarea id="description" placeholder="Explain when this rule applies"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="start-hour">Applies From (Hour)</label>
-                                <input type="number" id="start-hour" min="0" max="23" placeholder="e.g. 9">
-                                <span class="form-hint">24h format, optional</span>
-                            </div>
-                            <div class="form-group">
-                                <label for="end-hour">Applies Until (Hour)</label>
-                                <input type="number" id="end-hour" min="0" max="23" placeholder="e.g. 17">
+                                <label>Active Days (Optional - leave empty for all days)</label>
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                    <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                                        <input type="checkbox" name="day" value="Mon"> Mon
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                                        <input type="checkbox" name="day" value="Tue"> Tue
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                                        <input type="checkbox" name="day" value="Wed"> Wed
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                                        <input type="checkbox" name="day" value="Thu"> Thu
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                                        <input type="checkbox" name="day" value="Fri"> Fri
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                                        <input type="checkbox" name="day" value="Sat"> Sat
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                                        <input type="checkbox" name="day" value="Sun"> Sun
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -87,4 +111,5 @@
     <script src="js/admin-layout.js"></script>
     <script src="js/pricing-rule-form.js"></script>
 </body>
+
 </html>

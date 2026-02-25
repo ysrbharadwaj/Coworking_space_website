@@ -32,14 +32,16 @@ router.post('/generate/:booking_id', async (req, res) => {
 
     if (qrError) throw qrError;
 
-    // Generate QR code image (base64)
-    const qrCodeImage = await generateQRCode(qr_value);
+    // Generate QR code image with URL to ticket page
+    const ticketUrl = `http://localhost:8080/ticket.html?id=${booking_id}`;
+    const qrCodeImage = await generateQRCode(ticketUrl);
 
     res.json({
       success: true,
       data: {
         qr_code: qrCode,
-        qr_image: qrCodeImage
+        qr_image: qrCodeImage,
+        ticket_url: ticketUrl
       }
     });
   } catch (error) {
@@ -162,6 +164,91 @@ router.get('/', async (req, res) => {
 
     if (error) throw error;
     res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get complete ticket details via QR code
+router.get('/ticket', async (req, res) => {
+  try {
+    const { qr } = req.query;
+
+    if (!qr) {
+      return res.status(400).json({ success: false, error: 'QR value required' });
+    }
+
+    // Find booking by QR value
+    const { data: qrCode, error: qrError } = await supabase
+      .from('qr_codes')
+      .select('booking_id')
+      .eq('qr_value', qr)
+      .single();
+
+    if (qrError) throw qrError;
+
+    // Get complete booking details
+    const { data: booking, error: bookingError } = await supabase
+      .from('bookings')
+      .select(`
+        *,
+        workspaces (
+          id,
+          name,
+          type,
+          capacity,
+          base_price,
+          amenities,
+          hub_id
+        )
+      `)
+      .eq('id', qrCode.booking_id)
+      .single();
+
+    if (bookingError) throw bookingError;
+
+    // Get hub details
+    const { data: hub, error: hubError } = await supabase
+      .from('working_hubs')
+      .select('*')
+      .eq('id', booking.workspaces.hub_id)
+      .single();
+
+    if (hubError) throw hubError;
+
+    // Get booking resources
+    const { data: bookingResources, error: resourcesError } = await supabase
+      .from('booking_resources')
+      .select(`
+        quantity,
+        resources (
+          id,
+          name,
+          description,
+          price_per_slot
+        )
+      `)
+      .eq('booking_id', qrCode.booking_id);
+
+    const resources = bookingResources?.map(br => ({
+      ...br.resources,
+      quantity: br.quantity
+    })) || [];
+
+    // Generate QR image
+    const ticketUrl = `http://localhost:8080/ticket.html?qr=${qr}`;
+    const qrImage = await generateQRCode(ticketUrl);
+
+    res.json({
+      success: true,
+      data: {
+        booking,
+        workspace: booking.workspaces,
+        hub,
+        resources,
+        qr_image: qrImage
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

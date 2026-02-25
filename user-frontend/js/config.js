@@ -37,13 +37,20 @@ function formatPaymentMethod(method) {
 }
 
 function formatDateTime(dateTime) {
-    return new Date(dateTime).toLocaleString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    // Parse ISO string directly: "2026-02-25T21:30:00.000Z"
+    const isoString = dateTime.includes('T') ? dateTime : new Date(dateTime).toISOString();
+    const [datePart, timePart] = isoString.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hourMin] = timePart.split(':');
+    const hours24 = parseInt(hourMin);
+    const minutes = timePart.split(':')[1];
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthName = months[parseInt(month) - 1];
+    const ampm = hours24 >= 12 ? 'pm' : 'am';
+    const hours12 = hours24 % 12 || 12;
+
+    return `${parseInt(day)} ${monthName} ${year}, ${String(hours12).padStart(2, '0')}:${minutes} ${ampm}`;
 }
 
 function formatCurrency(amount) {
@@ -152,12 +159,12 @@ function validateForm(formEl) {
 function checkValidationRule(rule, param, field) {
     const val = field.value.trim();
     const label = field.getAttribute('data-label') || field.id || 'This field';
-    if (rule === 'required' && !val)          return `${label} is required.`;
-    if (rule === 'email'    && val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return 'Enter a valid email address.';
-    if (rule === 'min'      && val && Number(val) < Number(param))  return `Minimum value is ${param}.`;
-    if (rule === 'max'      && val && Number(val) > Number(param))  return `Maximum value is ${param}.`;
-    if (rule === 'minlen'   && val && val.length < Number(param))   return `Minimum ${param} characters required.`;
-    if (rule === 'future'   && val && new Date(val) <= new Date())  return `${label} must be a future date/time.`;
+    if (rule === 'required' && !val) return `${label} is required.`;
+    if (rule === 'email' && val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return 'Enter a valid email address.';
+    if (rule === 'min' && val && Number(val) < Number(param)) return `Minimum value is ${param}.`;
+    if (rule === 'max' && val && Number(val) > Number(param)) return `Maximum value is ${param}.`;
+    if (rule === 'minlen' && val && val.length < Number(param)) return `Minimum ${param} characters required.`;
+    if (rule === 'future' && val && new Date(val) <= new Date()) return `${label} must be a future date/time.`;
     if (rule === 'afterField') {
         const other = document.getElementById(param);
         if (other && val && other.value && new Date(val) <= new Date(other.value))

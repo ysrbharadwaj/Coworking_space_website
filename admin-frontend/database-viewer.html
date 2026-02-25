@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Viewer - WorkSpace Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .table-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .table-tab {
+            padding: 0.6rem 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .table-tab:hover {
+            background: var(--light);
+        }
+
+        .table-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .record-count {
+            background: var(--accent);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1><i class="fas fa-database"></i> Database Viewer</h1>
+            <button class="btn btn-primary" onclick="refreshCurrentTable()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </header>
+        <div class="admin-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Select Table</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-tabs" id="table-tabs"></div>
+                    <div id="loading" style="text-align:center;padding:2rem;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading data...</p>
+                    </div>
+                    <div id="data-container" style="display:none;">
+                        <div
+                            style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding:0.75rem;background:var(--light);">
+                            <div>
+                                <strong id="current-table-name"></strong>
+                                <span class="record-count" id="record-count">0 records</span>
+                            </div>
+                        </div>
+                        <div id="table-view" class="table-wrapper"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/admin-layout.js"></script>
+    <script>
+        let currentTable = null;
+        let currentData = null;
+
+        const tables = [
+            { name: 'working_hubs', label: 'Working Hubs', endpoint: '/hubs' },
+            { name: 'workspaces', label: 'Workspaces', endpoint: '/workspaces' },
+            { name: 'resources', label: 'Resources', endpoint: '/resources' },
+            { name: 'bookings', label: 'Bookings', endpoint: '/bookings' },
+            { name: 'pricing_rules', label: 'Pricing Rules', endpoint: '/pricing' },
+            { name: 'qr_codes', label: 'QR Codes', endpoint: '/qr' },
+            { name: 'ratings', label: 'Ratings', endpoint: '/ratings' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTabs();
+            if (tables.length > 0) loadTable(tables[0]);
+        });
+
+        function renderTabs() {
+            const container = document.getElementById('table-tabs');
+            container.innerHTML = tables.map((t, i) =>
+                '<button class="table-tab" onclick="loadTable(tables[' + i + '])" data-table="' + t.name + '"><i class="fas fa-table"></i> ' + t.label + '</button>'
+            ).join('');
+        }
+
+        async function loadTable(table) {
+            currentTable = table;
+            document.querySelectorAll('.table-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.table === table.name);
+            });
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('data-container').style.display = 'none';
+
+            try {
+                const res = await fetch(API_URL + table.endpoint);
+                const json = await res.json();
+                currentData = json.data || json;
+                if (!Array.isArray(currentData)) currentData = [currentData];
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('data-container').style.display = 'block';
+                document.getElementById('current-table-name').textContent = table.label;
+                document.getElementById('record-count').textContent = currentData.length + ' record' + (currentData.length !== 1 ? 's' : '');
+
+                renderData();
+            } catch (err) {
+                document.getElementById('loading').innerHTML = '<i class="fas fa-exclamation-triangle"></i><p>Failed to load: ' + err.message + '</p>';
+            }
+        }
+
+        function renderData() {
+            const container = document.getElementById('table-view');
+            if (!currentData || currentData.length === 0) {
+                container.innerHTML = '<p>No data found</p>';
+                return;
+            }
+
+            const allKeys = new Set();
+            currentData.forEach(record => Object.keys(record).forEach(key => allKeys.add(key)));
+            const keys = Array.from(allKeys);
+
+            let tableHtml = '<table><thead><tr>';
+            keys.forEach(k => tableHtml += '<th>' + k + '</th>');
+            tableHtml += '</tr></thead><tbody>';
+
+            currentData.forEach(record => {
+                tableHtml += '<tr>';
+                keys.forEach(key => {
+                    const val = record[key];
+                    let display = val === null ? '—' : String(val);
+                    if (String(display).length > 100) display = display.substring(0, 100) + '...';
+                    tableHtml += '<td>' + display + '</td>';
+                });
+                tableHtml += '</tr>';
+            });
+
+            tableHtml += '</tbody></table>';
+            container.innerHTML = tableHtml;
+        }
+
+        function refreshCurrentTable() {
+            if (currentTable) {
+                loadTable(currentTable);
+                if (typeof showToast !== 'undefined') showToast('Data refreshed', 'success');
+            }
+        }
+    </script>
+</body>
+
+</html>

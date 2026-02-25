@@ -2,6 +2,33 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
 
+// Get all ratings (Admin)
+router.get('/', async (req, res) => {
+  try {
+    const { data: ratings, error } = await supabase
+      .from('ratings')
+      .select(`
+        *,
+        workspaces (
+          id,
+          name,
+          type,
+          working_hubs (
+            name,
+            city
+          )
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ success: true, data: ratings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Add rating to a workspace
 router.post('/:workspace_id', async (req, res) => {
   try {
@@ -10,9 +37,9 @@ router.post('/:workspace_id', async (req, res) => {
 
     // Validate rating
     if (!rating || rating < 1 || rating > 5) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Rating must be between 1 and 5' 
+      return res.status(400).json({
+        success: false,
+        error: 'Rating must be between 1 and 5'
       });
     }
 
@@ -24,9 +51,9 @@ router.post('/:workspace_id', async (req, res) => {
       .single();
 
     if (workspaceError || !workspace) {
-      return res.status(404).json({ 
-        success: false, 
-        error: 'Workspace not found' 
+      return res.status(404).json({
+        success: false,
+        error: 'Workspace not found'
       });
     }
 
@@ -41,9 +68,9 @@ router.post('/:workspace_id', async (req, res) => {
         .single();
 
       if (!booking) {
-        return res.status(400).json({ 
-          success: false, 
-          error: 'Only completed bookings can be rated' 
+        return res.status(400).json({
+          success: false,
+          error: 'Only completed bookings can be rated'
         });
       }
 
@@ -55,9 +82,9 @@ router.post('/:workspace_id', async (req, res) => {
         .single();
 
       if (existingRating) {
-        return res.status(400).json({ 
-          success: false, 
-          error: 'This booking has already been rated' 
+        return res.status(400).json({
+          success: false,
+          error: 'This booking has already been rated'
         });
       }
     }
@@ -110,8 +137,8 @@ router.get('/workspace/:workspace_id', async (req, res) => {
       1: ratings.filter(r => r.rating === 1).length
     };
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       data: {
         ratings,
         average: Math.round(avgRating * 10) / 10,
@@ -132,9 +159,9 @@ router.put('/:rating_id', async (req, res) => {
     const { rating, review } = req.body;
 
     if (rating && (rating < 1 || rating > 5)) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Rating must be between 1 and 5' 
+      return res.status(400).json({
+        success: false,
+        error: 'Rating must be between 1 and 5'
       });
     }
 

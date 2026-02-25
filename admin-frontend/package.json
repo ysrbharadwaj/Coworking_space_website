@@ -1,0 +1,12 @@
+{
+  "name": "workspace-admin",
+  "version": "1.0.0",
+  "description": "WorkSpace Admin Dashboard",
+  "scripts": {
+    "start": "http-server -p 8081 -a localhost -o login.html",
+    "dev": "http-server -p 8081 -a localhost -o login.html -c-1"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+}

@@ -7,7 +7,7 @@ const { calculateDynamicPrice } = require('../utils/pricing');
 router.get('/', async (req, res) => {
   try {
     const { workspace_id } = req.query;
-    
+
     let query = supabase
       .from('pricing_rules')
       .select(`
@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
           type
         )
       `)
-      .order('created_at', { ascending: false });
+      .order('id', { ascending: false });
 
     if (workspace_id) query = query.eq('workspace_id', workspace_id);
 
@@ -36,7 +36,14 @@ router.get('/:id', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('pricing_rules')
-      .select('*')
+      .select(`
+        *,
+        workspaces (
+          id,
+          name,
+          type
+        )
+      `)
       .eq('id', req.params.id)
       .single();
 
@@ -59,7 +66,14 @@ router.post('/', async (req, res) => {
       end_time,
       days
     } = req.body;
-    
+
+    if (!workspace_id || !rule_type) {
+      return res.status(400).json({
+        success: false,
+        error: 'workspace_id and rule_type are required'
+      });
+    }
+
     const { data, error } = await supabase
       .from('pricing_rules')
       .insert([{
@@ -67,14 +81,14 @@ router.post('/', async (req, res) => {
         rule_type,
         percentage_modifier: percentage_modifier || 0,
         flat_modifier: flat_modifier || 0,
-        start_time,
-        end_time,
+        start_time: start_time || null,
+        end_time: end_time || null,
         days: days || []
       }])
       .select();
 
     if (error) throw error;
-    res.json({ success: true, data });
+    res.json({ success: true, data: data[0] });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -93,23 +107,29 @@ router.put('/:id', async (req, res) => {
       end_time,
       days
     } = req.body;
-    
+
+    const updateData = {
+      rule_type,
+      percentage_modifier: percentage_modifier || 0,
+      flat_modifier: flat_modifier || 0,
+      start_time: start_time || null,
+      end_time: end_time || null,
+      days: days || []
+    };
+
+    // Only update workspace_id if provided
+    if (workspace_id) {
+      updateData.workspace_id = workspace_id;
+    }
+
     const { data, error } = await supabase
       .from('pricing_rules')
-      .update({
-        workspace_id,
-        rule_type,
-        percentage_modifier,
-        flat_modifier,
-        start_time,
-        end_time,
-        days
-      })
+      .update(updateData)
       .eq('id', req.params.id)
       .select();
 
     if (error) throw error;
-    res.json({ success: true, data });
+    res.json({ success: true, data: data[0] });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

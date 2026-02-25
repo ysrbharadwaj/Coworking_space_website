@@ -20,7 +20,7 @@ async function loadBooking(id) {
         const qrData = qrRes.status === 'fulfilled' ? (await qrRes.value.json()).data : null;
 
         const canCancel = b.status === 'confirmed';
-        const hasQR     = b.status === 'confirmed' || b.status === 'checked_in';
+        const hasQR = b.status === 'confirmed' || b.status === 'checked_in';
 
         document.title = `Booking #${b.id} - WorkSpace`;
 
@@ -46,6 +46,7 @@ async function loadBooking(id) {
                                 ${detail('Check-out', formatDateTime(b.end_time))}
                                 ${detail('Booking Type', b.booking_type || 'N/A')}
                                 ${detail('Booking ID', `#${b.id}`)}
+                                ${detail('Booked/Paid On', `<strong>${formatDateTime(b.created_at)}</strong>`)}
                             </div>
                             <div style="padding-top:1rem;border-top:1px solid var(--border);
                                 display:flex;justify-content:space-between;align-items:center;">
@@ -84,10 +85,10 @@ async function loadBooking(id) {
                             <i class="fas fa-qrcode" style="color:var(--accent);"></i> Entry QR Code
                         </h3>
                         ${qrData?.qr_image
-                            ? `<img src="${qrData.qr_image}" alt="QR"
+                    ? `<img src="${qrData.qr_image}" alt="QR"
                                 style="max-width:220px;border:4px solid var(--accent);border-radius:8px;padding:.5rem;">`
-                            : `<p style="color:var(--text-light);">QR code not available.</p>`
-                        }
+                    : `<p style="color:var(--text-light);">QR code not available.</p>`
+                }
                         <p style="font-size:.85rem;color:var(--text-light);margin-top:1rem;">
                             Show this QR at the venue for check-in
                         </p>

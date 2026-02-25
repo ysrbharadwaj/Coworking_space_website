@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Supabase Viewer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #27ae60;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .connection-status.disconnected {
+            background: #e74c3c;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: #ecf0f1;
+        }
+
+        .tab.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box strong {
+            color: #2c3e50;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .json-viewer {
+            background: #263238;
+            color: #aed581;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow: auto;
+            max-height: 600px;
+            white-space: pre;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .count-badge {
+            background: #3498db;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .error {
+            background: #fee;
+            border-left: 4px solid #e74c3c;
+            padding: 1rem;
+            color: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            <i class="fas fa-database"></i>
+            Direct Supabase Database Viewer
+            <span id="status" class="connection-status">● Connected</span>
+        </h1>
+
+        <div class="info-box">
+            <strong><i class="fas fa-info-circle"></i> Direct Connection to Supabase</strong><br>
+            This page queries your Supabase database directly using the REST API.<br>
+            Project: <code>https://chjyfnvwvpbhtlydtcgf.supabase.co</code>
+        </div>
+
+        <div class="tabs" id="table-tabs"></div>
+
+        <div class="card">
+            <div class="controls">
+                <button class="btn" onclick="refreshTable()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button class="btn btn-success" onclick="toggleView()">
+                    <i class="fas fa-code"></i> <span id="view-toggle-text">JSON View</span>
+                </button>
+                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                    <input type="checkbox" id="auto-refresh" onchange="toggleAutoRefresh()" checked>
+                    <span style="font-size:0.9rem;color:#2c3e50;">Auto-refresh (5s)</span>
+                </label>
+                <span style="margin-left:auto;color:#7f8c8d;">
+                    <strong id="current-table-name">—</strong>
+                    <span class="count-badge" id="record-count">0</span>
+                </span>
+            </div>
+
+            <div id="loading" class="loading" style="display:none;">
+                <div class="spinner"></div>
+                <p style="margin-top:1rem;">Loading data from Supabase...</p>
+            </div>
+
+            <div id="error" class="error" style="display:none;"></div>
+
+            <div id="table-view" style="overflow-x:auto;"></div>
+            <div id="json-view" class="json-viewer" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://chjyfnvwvpbhtlydtcgf.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoanlmbnZ3dnBiaHRseWR0Y2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNzI0MTEsImV4cCI6MjA3ODc0ODQxMX0.eFK4lLxhP0HGntljE6UBbAEVoeH17_ujAo4Sf_2WI7M';
+
+        const tables = [
+            { name: 'working_hubs', label: 'Working Hubs' },
+            { name: 'workspaces', label: 'Workspaces' },
+            { name: 'bookings', label: 'Bookings' },
+            { name: 'resources', label: 'Resources' },
+            { name: 'pricing_rules', label: 'Pricing Rules' },
+            { name: 'qr_codes', label: 'QR Codes' },
+            { name: 'ratings', label: 'Ratings' }
+        ];
+
+        let currentTable = null;
+        let currentData = null;
+        let viewMode = 'table';
+        let autoRefreshInterval = null;
+
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            const enabled = document.getElementById('auto-refresh').checked;
+
+            if (enabled) {
+                // Start auto-refresh every 5 seconds
+                autoRefreshInterval = setInterval(() => {
+                    if (currentTable) {
+                        const tableObj = tables.find(t => t.name === currentTable);
+                        if (tableObj) {
+                            loadTable(tableObj.name, tableObj.label, true);
+                        }
+                    }
+                }, 5000);
+            } else {
+                // Stop auto-refresh
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+            }
+        }
+
+        // Render tabs
+        function renderTabs() {
+            const container = document.getElementById('table-tabs');
+            container.innerHTML = tables.map(t => `
+                <div class="tab" onclick="loadTable('${t.name}', '${t.label}')" data-table="${t.name}">
+                    <i class="fas fa-table"></i> ${t.label}
+                </div>
+            `).join('');
+        }
+
+        // Load table data from Supabase
+        async function loadTable(tableName, label, isAutoRefresh = false) {
+            currentTable = tableName;
+            document.getElementById('current-table-name').textContent = label;
+
+            // Only show loading spinner on manual refresh
+            if (!isAutoRefresh) {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('table-view').innerHTML = '';
+                document.getElementById('json-view').textContent = '';
+            }
+
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.table === tableName);
+            });
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/${tableName}?select=*&order=created_at.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                currentData = await response.json();
+                document.getElementById('record-count').textContent = currentData.length;
+
+                if (!isAutoRefresh) {
+                    document.getElementById('loading').style.display = 'none';
+                }
+
+                document.getElementById('status').textContent = '● Connected';
+                document.getElementById('status').className = 'connection-status';
+
+                renderData();
+            } catch (err) {
+                if (!isAutoRefresh) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').innerHTML = `
+                        <strong><i class="fas fa-exclamation-triangle"></i> Error Loading Data</strong><br>
+                        ${err.message}<br><br>
+                        <small>Make sure your backend server is running and Supabase credentials are correct.</small>
+                    `;
+                }
+                document.getElementById('status').textContent = '● Disconnected';
+                document.getElementById('status').className = 'connection-status disconnected';
+            }
+        }
+
+        // Render data based on view mode
+        function renderData() {
+            if (viewMode === 'table') {
+                renderTableView();
+            } else {
+                renderJsonView();
+            }
+        }
+
+        // Render table view
+        function renderTableView() {
+            const container = document.getElementById('table-view');
+            container.style.display = 'block';
+            document.getElementById('json-view').style.display = 'none';
+
+            if (!currentData || currentData.length === 0) {
+                container.innerHTML = '<p style="text-align:center;padding:2rem;color:#7f8c8d;">No records found in this table</p>';
+                return;
+            }
+
+            // Get all unique keys
+            const keys = [...new Set(currentData.flatMap(Object.keys))];
+
+            const html = `
+                <table>
+                    <thead>
+                        <tr>${keys.map(k => `<th>${k}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${currentData.map(row => `
+                            <tr>
+                                ${keys.map(key => {
+                const val = row[key];
+                if (val === null || val === undefined) return '<td style="color:#999;">—</td>';
+                if (typeof val === 'object') return `<td><code style="font-size:0.75rem;">${JSON.stringify(val)}</code></td>`;
+                if (typeof val === 'boolean') return `<td>${val ? '✓' : '✗'}</td>`;
+                const str = String(val);
+                if (str.length > 80) return `<td title="${escapeHtml(str)}">${escapeHtml(str.substring(0, 80))}...</td>`;
+                return `<td>${escapeHtml(str)}</td>`;
+            }).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = html;
+        }
+
+        // Render JSON view
+        function renderJsonView() {
+            document.getElementById('table-view').style.display = 'none';
+            const container = document.getElementById('json-view');
+            container.style.display = 'block';
+            container.textContent = JSON.stringify(currentData, null, 2);
+        }
+
+        // Toggle view mode
+        function toggleView() {
+            viewMode = viewMode === 'table' ? 'json' : 'table';
+            document.getElementById('view-toggle-text').textContent = viewMode === 'table' ? 'JSON View' : 'Table View';
+            renderData();
+        }
+
+        // Refresh current table
+        function refreshTable() {
+            if (currentTable) {
+                const tableObj = tables.find(t => t.name === currentTable);
+                if (tableObj) {
+                    loadTable(tableObj.name, tableObj.label);
+                }
+            }
+        }
+
+        // Helper: Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTabs();
+            // Auto-load first table
+            if (tables.length > 0) {
+                loadTable(tables[0].name, tables[0].label);
+            }
+            // Start auto-refresh
+            toggleAutoRefresh();
+        });
+    </script>
+</body>
+
+</html>

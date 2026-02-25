@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hubs - WorkSpace Admin</title>
+    <title>Users - WorkSpace Admin</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -12,20 +12,42 @@
 <body>
     <main class="admin-main">
         <header class="admin-header">
-            <h1><i class="fas fa-building"></i> Working Hubs</h1>
+            <h1><i class="fas fa-users"></i> Users</h1>
             <span style="color:var(--text-light);font-size:.9rem;" id="last-updated"></span>
-            <a href="hub-form.html" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add Hub
-            </a>
         </header>
         <div class="admin-content">
+            <!-- Stats -->
+            <div class="stats-row" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div>
+                        <div class="value" id="total-users">—</div>
+                        <div class="label">Total Users</div>
+                    </div>
+                </div>
+                <div class="stat-card green">
+                    <i class="fas fa-calendar-check"></i>
+                    <div>
+                        <div class="value" id="total-user-bookings">—</div>
+                        <div class="label">Total Bookings</div>
+                    </div>
+                </div>
+                <div class="stat-card yellow">
+                    <i class="fas fa-user-clock"></i>
+                    <div>
+                        <div class="value" id="active-users">—</div>
+                        <div class="label">Active This Month</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="toolbar">
                 <div class="toolbar-search">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="search" placeholder="Search hubs..." oninput="filterHubs()">
+                    <input type="text" id="search" placeholder="Search by name or email..." oninput="filterUsers()">
                 </div>
                 <div class="toolbar-filter">
-                    <select id="filter-city" onchange="filterHubs()">
+                    <select id="filter-city" onchange="filterUsers()">
                         <option value="">All Cities</option>
                     </select>
                 </div>
@@ -37,16 +59,16 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
                                     <th>Name</th>
-                                    <th>City</th>
-                                    <th>State</th>
-                                    <th>Address</th>
-                                    <th>Workspaces</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Total Bookings</th>
+                                    <th>Total Spent</th>
+                                    <th>Last Booking</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="hubs-table">
+                            <tbody id="users-table">
                                 <tr>
                                     <td colspan="7" style="text-align:center;">
                                         <i class="fas fa-spinner fa-spin"></i> Loading…
@@ -62,7 +84,7 @@
 
     <script src="js/config.js"></script>
     <script src="js/admin-layout.js"></script>
-    <script src="js/hubs-list.js"></script>
+    <script src="js/users-list.js"></script>
 </body>
 
 </html>

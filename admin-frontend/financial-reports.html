@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,15 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <main class="admin-main">
         <header class="admin-header">
             <h1><i class="fas fa-chart-bar"></i> Financial Reports</h1>
             <div style="display:flex;gap:.75rem;align-items:center;">
                 <label style="font-size:.9rem;color:var(--text-light);">Period:</label>
-                <select id="period" onchange="loadReport()" style="padding:.5rem .75rem;border:1px solid var(--border);border-radius:6px;font-size:.9rem;">
+                <select id="period" onchange="loadReport()"
+                    style="padding:.5rem .75rem;border:1px solid var(--border);font-size:.9rem;">
                     <option value="7">Last 7 days</option>
                     <option value="30" selected>Last 30 days</option>
                     <option value="90">Last 90 days</option>
@@ -26,26 +29,40 @@
             <div class="stats-row">
                 <div class="stat-card">
                     <i class="fas fa-rupee-sign"></i>
-                    <div><div class="value" id="total-revenue">—</div><div class="label">Total Revenue</div></div>
+                    <div>
+                        <div class="value" id="total-revenue">—</div>
+                        <div class="label">Total Revenue</div>
+                    </div>
                 </div>
                 <div class="stat-card green">
                     <i class="fas fa-calendar-check"></i>
-                    <div><div class="value" id="total-bookings">—</div><div class="label">Total Bookings</div></div>
+                    <div>
+                        <div class="value" id="total-bookings">—</div>
+                        <div class="label">Total Bookings</div>
+                    </div>
                 </div>
                 <div class="stat-card yellow">
                     <i class="fas fa-percentage"></i>
-                    <div><div class="value" id="occupancy-rate">—</div><div class="label">Avg Occupancy</div></div>
+                    <div>
+                        <div class="value" id="occupancy-rate">—</div>
+                        <div class="label">Avg Occupancy</div>
+                    </div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-star"></i>
-                    <div><div class="value" id="avg-rating">—</div><div class="label">Avg Rating</div></div>
+                    <div>
+                        <div class="value" id="avg-rating">—</div>
+                        <div class="label">Avg Rating</div>
+                    </div>
                 </div>
             </div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
                 <!-- Revenue by Hub -->
                 <div class="card">
-                    <div class="card-header"><h2>Revenue by Hub</h2></div>
+                    <div class="card-header">
+                        <h2>Revenue by Hub</h2>
+                    </div>
                     <div class="card-body">
                         <div id="revenue-by-hub">
                             <div class="loading"><i class="fas fa-spinner fa-spin"></i></div>
@@ -55,7 +72,9 @@
 
                 <!-- Bookings by Status -->
                 <div class="card">
-                    <div class="card-header"><h2>Bookings by Status</h2></div>
+                    <div class="card-header">
+                        <h2>Bookings by Status</h2>
+                    </div>
                     <div class="card-body">
                         <div id="bookings-by-status">
                             <div class="loading"><i class="fas fa-spinner fa-spin"></i></div>
@@ -65,7 +84,9 @@
 
                 <!-- Revenue by Workspace Type -->
                 <div class="card">
-                    <div class="card-header"><h2>Revenue by Workspace Type</h2></div>
+                    <div class="card-header">
+                        <h2>Revenue by Workspace Type</h2>
+                    </div>
                     <div class="card-body">
                         <div id="revenue-by-type">
                             <div class="loading"><i class="fas fa-spinner fa-spin"></i></div>
@@ -75,7 +96,9 @@
 
                 <!-- Top Workspaces -->
                 <div class="card">
-                    <div class="card-header"><h2>Top 5 Workspaces</h2></div>
+                    <div class="card-header">
+                        <h2>Top 5 Workspaces</h2>
+                    </div>
                     <div class="card-body">
                         <div id="top-workspaces">
                             <div class="loading"><i class="fas fa-spinner fa-spin"></i></div>
@@ -90,4 +113,5 @@
     <script src="js/admin-layout.js"></script>
     <script src="js/financial-reports.js"></script>
 </body>
+
 </html>

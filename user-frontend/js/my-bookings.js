@@ -1,7 +1,7 @@
 // my-bookings.js – View and manage all bookings
 
-let allBookings    = [];
-let activeStatus   = '';
+let allBookings = [];
+let activeStatus = '';
 
 document.addEventListener('DOMContentLoaded', () => {
     loadBookings();
@@ -13,7 +13,7 @@ async function loadBookings() {
     const container = document.getElementById('bookings-list');
     container.innerHTML = loadingHTML('Loading bookings...');
     try {
-        const res  = await fetch(`${API_URL}/bookings`);
+        const res = await fetch(`${API_URL}/bookings`);
         const result = await res.json();
         allBookings = result.data || [];
         applyFilters();
@@ -68,6 +68,7 @@ function displayBookings(bookings) {
                 <div class="detail-item"><i class="fas fa-user"></i><span>${b.user_name}</span></div>
                 <div class="detail-item"><i class="fas fa-calendar"></i><span>${formatDateTime(b.start_time)}</span></div>
                 <div class="detail-item"><i class="fas fa-clock"></i><span>${formatDateTime(b.end_time)}</span></div>
+                <div class="detail-item" title="Booking & Payment Date"><i class="fas fa-check-circle"></i><span><strong>${formatDateTime(b.created_at)}</strong></span></div>
             </div>
             <div class="booking-footer">
                 <div class="booking-price">${formatCurrency(b.total_price)}</div>

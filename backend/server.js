@@ -16,6 +16,8 @@ const bookingsRouter = require('./routes/bookings');
 const pricingRouter = require('./routes/pricing');
 const qrRouter = require('./routes/qr');
 const ratingsRouter = require('./routes/ratings');
+const usersRouter = require('./routes/users');
+const transactionsRouter = require('./routes/transactions');
 
 // Routes
 app.use('/api/hubs', hubsRouter);
@@ -25,6 +27,8 @@ app.use('/api/bookings', bookingsRouter);
 app.use('/api/pricing', pricingRouter);
 app.use('/api/qr', qrRouter);
 app.use('/api/ratings', ratingsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/transactions', transactionsRouter);
 
 // Health check
 app.get('/health', (req, res) => {

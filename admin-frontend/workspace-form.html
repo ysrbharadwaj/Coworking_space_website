@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <main class="admin-main">
         <header class="admin-header">
@@ -24,19 +26,19 @@
                     <form id="workspace-form" novalidate>
                         <div class="form-grid">
                             <div class="form-group full">
-                                <label for="hub-id">Hub <span style="color:var(--danger)">*</span></label>
-                                <select id="hub-id" data-validate="required" data-label="Hub">
+                                <label for="hub_id">Hub <span style="color:var(--danger)">*</span></label>
+                                <select id="hub_id" name="hub_id" data-validate="required" data-label="Hub">
                                     <option value="">-- Select Hub --</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="name">Workspace Name <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="name" placeholder="e.g. Conference Room A"
+                                <input type="text" id="name" name="name" placeholder="e.g. Conference Room A"
                                     data-validate="required|minlen:2" data-label="Workspace Name">
                             </div>
                             <div class="form-group">
                                 <label for="type">Type <span style="color:var(--danger)">*</span></label>
-                                <select id="type" data-validate="required" data-label="Type">
+                                <select id="type" name="type" data-validate="required" data-label="Type">
                                     <option value="">-- Select Type --</option>
                                     <option value="hotdesk">Hot Desk</option>
                                     <option value="cabin">Private Cabin</option>
@@ -45,27 +47,31 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="capacity">Capacity (people) <span style="color:var(--danger)">*</span></label>
-                                <input type="number" id="capacity" min="1" placeholder="e.g. 10"
+                                <label for="capacity">Capacity (people) <span
+                                        style="color:var(--danger)">*</span></label>
+                                <input type="number" id="capacity" name="capacity" min="1" placeholder="e.g. 10"
                                     data-validate="required|min:1" data-label="Capacity">
                             </div>
                             <div class="form-group">
-                                <label for="base-price">Base Price (₹/hr) <span style="color:var(--danger)">*</span></label>
-                                <input type="number" id="base-price" min="1" placeholder="e.g. 500"
+                                <label for="base_price">Base Price (₹/hr) <span
+                                        style="color:var(--danger)">*</span></label>
+                                <input type="number" id="base_price" name="base_price" min="1" placeholder="e.g. 500"
                                     data-validate="required|min:1" data-label="Base Price">
                             </div>
                             <div class="form-group full">
                                 <label for="amenities">Amenities</label>
-                                <input type="text" id="amenities" placeholder="Wi-Fi, AC, Projector (comma separated)">
+                                <input type="text" id="amenities" name="amenities"
+                                    placeholder="Wi-Fi, AC, Projector (comma separated)">
                                 <span class="form-hint">Separate multiple amenities with commas</span>
                             </div>
                             <div class="form-group full">
                                 <label for="description">Description</label>
-                                <textarea id="description" placeholder="Brief description of this workspace"></textarea>
+                                <textarea id="description" name="description"
+                                    placeholder="Brief description of this workspace"></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="is-available">Availability</label>
-                                <select id="is-available">
+                                <label for="is_available">Availability</label>
+                                <select id="is_available" name="is_available">
                                     <option value="true">Available</option>
                                     <option value="false">Unavailable</option>
                                 </select>
@@ -90,4 +96,5 @@
     <script src="js/admin-layout.js"></script>
     <script src="js/workspace-form.js"></script>
 </body>
+
 </html>
