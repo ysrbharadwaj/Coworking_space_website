@@ -4,8 +4,8 @@ const isEdit = !!resourceId;
 
 document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('form-heading').textContent = isEdit ? 'Edit Resource' : 'Add New Resource';
-    document.getElementById('page-title').textContent   = isEdit ? 'Edit Resource' : 'Add Resource';
-    document.getElementById('submit-btn').textContent   = isEdit ? 'Update Resource' : 'Save Resource';
+    document.getElementById('page-title').textContent = isEdit ? 'Edit Resource' : 'Add Resource';
+    document.getElementById('submit-btn').textContent = isEdit ? 'Update Resource' : 'Save Resource';
 
     await loadWorkspaces();
     if (isEdit) await loadResource();
@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadWorkspaces() {
     try {
-        const workspaces = await fetch(`${API_URL}/workspaces`).then(r => r.json());
+        const json = await fetch(`${API_URL}/workspaces`).then(r => r.json());
+        const workspaces = json.data || json;
         const sel = document.getElementById('workspace_id');
         workspaces.forEach(w => {
             const opt = document.createElement('option');
@@ -30,13 +31,14 @@ async function loadWorkspaces() {
 async function loadResource() {
     try {
         const res = await fetch(`${API_URL}/resources/${resourceId}`);
-        const r = await res.json();
+        const json = await res.json();
+        const r = json.data || json;
         const f = document.getElementById('resource-form');
-        f.elements['workspace_id'].value  = r.workspace_id    || '';
-        f.elements['name'].value          = r.name            || '';
-        f.elements['price_per_slot'].value= r.price_per_slot  || '';
-        f.elements['quantity'].value      = r.quantity        || '';
-        f.elements['description'].value   = r.description     || '';
+        f.elements['workspace_id'].value = r.workspace_id || '';
+        f.elements['name'].value = r.name || '';
+        f.elements['price_per_slot'].value = r.price_per_slot || '';
+        f.elements['quantity'].value = r.quantity || '';
+        f.elements['description'].value = r.description || '';
     } catch {
         showToast('Failed to load resource data', 'error');
     }
@@ -51,15 +53,15 @@ async function handleSubmit(e) {
 
     const data = Object.fromEntries(new FormData(e.target).entries());
     const body = {
-        workspace_id:   parseInt(data.workspace_id),
-        name:           data.name,
+        workspace_id: parseInt(data.workspace_id),
+        name: data.name,
         price_per_slot: parseFloat(data.price_per_slot),
-        quantity:       data.quantity ? parseInt(data.quantity) : undefined,
-        description:    data.description,
+        quantity: data.quantity ? parseInt(data.quantity) : undefined,
+        description: data.description,
     };
 
-    const url    = isEdit ? `${API_URL}/resources/${resourceId}` : `${API_URL}/resources`;
-    const method = isEdit ? 'PATCH' : 'POST';
+    const url = isEdit ? `${API_URL}/resources/${resourceId}` : `${API_URL}/resources`;
+    const method = isEdit ? 'PUT' : 'POST';
 
     try {
         const res = await fetch(url, {

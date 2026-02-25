@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,12 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <main class="admin-main">
         <header class="admin-header">
             <h1><i class="fas fa-boxes"></i> Resources</h1>
+            <span style="color:var(--text-light);font-size:.9rem;" id="last-updated"></span>
             <a href="resource-form.html" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add Resource
             </a>
@@ -29,14 +32,20 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th><th>Name</th><th>Description</th>
-                                    <th>Price/Slot</th><th>Workspace</th><th>Actions</th>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Price/Slot</th>
+                                    <th>Workspace</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="resources-table">
-                                <tr><td colspan="6" style="text-align:center;">
-                                    <i class="fas fa-spinner fa-spin"></i> Loading…
-                                </td></tr>
+                                <tr>
+                                    <td colspan="6" style="text-align:center;">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading…
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -49,4 +58,5 @@
     <script src="js/admin-layout.js"></script>
     <script src="js/resources-list.js"></script>
 </body>
+
 </html>

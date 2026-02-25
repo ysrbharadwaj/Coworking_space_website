@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <main class="admin-main">
         <header class="admin-header">
@@ -25,42 +27,44 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="name">Hub Name <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="name" placeholder="e.g. Tech Hub Downtown"
+                                <input type="text" id="name" name="name" placeholder="e.g. Tech Hub Downtown"
                                     data-validate="required|minlen:3" data-label="Hub Name">
                             </div>
                             <div class="form-group">
                                 <label for="city">City <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="city" placeholder="e.g. Mumbai"
+                                <input type="text" id="city" name="city" placeholder="e.g. Mumbai"
                                     data-validate="required" data-label="City">
                             </div>
                             <div class="form-group">
                                 <label for="state">State <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="state" placeholder="e.g. Maharashtra"
+                                <input type="text" id="state" name="state" placeholder="e.g. Maharashtra"
                                     data-validate="required" data-label="State">
                             </div>
                             <div class="form-group">
                                 <label for="country">Country <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="country" value="India"
-                                    data-validate="required" data-label="Country">
+                                <input type="text" id="country" name="country" value="India" data-validate="required"
+                                    data-label="Country">
                             </div>
                             <div class="form-group full">
                                 <label for="address">Full Address <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="address" placeholder="Street, Area, Landmark"
+                                <input type="text" id="address" name="address" placeholder="Street, Area, Landmark"
                                     data-validate="required|minlen:5" data-label="Address">
                             </div>
                             <div class="form-group">
                                 <label for="pincode">Pincode <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="pincode" placeholder="6-digit pincode" maxlength="6"
-                                    data-validate="required|pincode" data-label="Pincode">
+                                <input type="text" id="pincode" name="pincode" placeholder="6-digit pincode"
+                                    maxlength="6" data-validate="required|pincode" data-label="Pincode">
                             </div>
                             <div class="form-group">
                                 <label for="latitude">Latitude</label>
-                                <input type="number" id="latitude" step="0.0001" placeholder="e.g. 19.0760">
+                                <input type="number" id="latitude" name="latitude" step="0.0001"
+                                    placeholder="e.g. 19.0760">
                                 <span class="form-hint">Optional – for map display</span>
                             </div>
                             <div class="form-group">
                                 <label for="longitude">Longitude</label>
-                                <input type="number" id="longitude" step="0.0001" placeholder="e.g. 72.8777">
+                                <input type="number" id="longitude" name="longitude" step="0.0001"
+                                    placeholder="e.g. 72.8777">
                             </div>
                         </div>
 
@@ -82,4 +86,5 @@
     <script src="js/admin-layout.js"></script>
     <script src="js/hub-form.js"></script>
 </body>
+
 </html>

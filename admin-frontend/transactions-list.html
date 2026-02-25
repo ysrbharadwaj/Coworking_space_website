@@ -1,48 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transactions - WorkSpace Admin</title>
+    <title>Bookings & Transactions - WorkSpace Admin</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <main class="admin-main">
         <header class="admin-header">
-            <h1><i class="fas fa-receipt"></i> All Transactions</h1>
+            <h1><i class="fas fa-calendar-check"></i> Bookings & Transactions</h1> <span
+                style="color:var(--text-light);font-size:.9rem;" id="last-updated"></span>
         </header>
         <div class="admin-content">
             <div class="stats-row" id="stats-row">
                 <div class="stat-card">
-                    <i class="fas fa-receipt"></i>
-                    <div><div class="value" id="total-count">—</div><div class="label">Total</div></div>
+                    <i class="fas fa-calendar-check"></i>
+                    <div>
+                        <div class="value" id="total-count">—</div>
+                        <div class="label">Total Bookings</div>
+                    </div>
                 </div>
                 <div class="stat-card green">
                     <i class="fas fa-check-circle"></i>
-                    <div><div class="value" id="success-count">—</div><div class="label">Successful</div></div>
+                    <div>
+                        <div class="value" id="success-count">—</div>
+                        <div class="label">Active</div>
+                    </div>
                 </div>
                 <div class="stat-card red">
                     <i class="fas fa-times-circle"></i>
-                    <div><div class="value" id="failed-count">—</div><div class="label">Failed</div></div>
+                    <div>
+                        <div class="value" id="failed-count">—</div>
+                        <div class="label">Cancelled</div>
+                    </div>
                 </div>
                 <div class="stat-card yellow">
                     <i class="fas fa-rupee-sign"></i>
-                    <div><div class="value" id="total-revenue">—</div><div class="label">Revenue</div></div>
+                    <div>
+                        <div class="value" id="total-revenue">—</div>
+                        <div class="label">Total Revenue</div>
+                    </div>
                 </div>
             </div>
 
             <div class="toolbar">
                 <div class="toolbar-search">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="search" placeholder="Search transactions..." oninput="filterTransactions()">
+                    <input type="text" id="search" placeholder="Search by name, email, booking ID..."
+                        oninput="filterTransactions()">
                 </div>
                 <div class="toolbar-filter">
                     <select id="filter-status" onchange="filterTransactions()">
                         <option value="">All Statuses</option>
-                        <option value="success">Success</option>
-                        <option value="failed">Failed</option>
-                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="checked_in">Checked In</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
                 <div class="toolbar-filter">
@@ -62,14 +79,21 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Transaction ID</th><th>Booking ID</th><th>Guest</th>
-                                    <th>Amount</th><th>Method</th><th>Status</th><th>Date</th>
+                                    <th>Booking ID</th>
+                                    <th>Transaction ID</th>
+                                    <th>Guest Name</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Transaction Time</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="transactions-table">
-                                <tr><td colspan="7" style="text-align:center;">
-                                    <i class="fas fa-spinner fa-spin"></i> Loading…
-                                </td></tr>
+                                <tr>
+                                    <td colspan="7" style="text-align:center;">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading…
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -82,4 +106,5 @@
     <script src="js/admin-layout.js"></script>
     <script src="js/transactions-list.js"></script>
 </body>
+
 </html>

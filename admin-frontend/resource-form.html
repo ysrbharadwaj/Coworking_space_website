@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <main class="admin-main">
         <header class="admin-header">
@@ -24,24 +26,31 @@
                     <form id="resource-form" novalidate>
                         <div class="form-grid">
                             <div class="form-group full">
-                                <label for="workspace-id">Workspace <span style="color:var(--danger)">*</span></label>
-                                <select id="workspace-id" data-validate="required" data-label="Workspace">
+                                <label for="workspace_id">Workspace <span style="color:var(--danger)">*</span></label>
+                                <select id="workspace_id" name="workspace_id" data-validate="required"
+                                    data-label="Workspace">
                                     <option value="">-- Select Workspace --</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="name">Resource Name <span style="color:var(--danger)">*</span></label>
-                                <input type="text" id="name" placeholder="e.g. Projector, Whiteboard"
+                                <input type="text" id="name" name="name" placeholder="e.g. Projector, Whiteboard"
                                     data-validate="required|minlen:2" data-label="Resource Name">
                             </div>
                             <div class="form-group">
-                                <label for="price-per-slot">Price per Slot/Hour (₹) <span style="color:var(--danger)">*</span></label>
-                                <input type="number" id="price-per-slot" min="1" placeholder="e.g. 100"
-                                    data-validate="required|min:1" data-label="Price per Slot">
+                                <label for="price_per_slot">Price per Slot/Hour (₹) <span
+                                        style="color:var(--danger)">*</span></label>
+                                <input type="number" id="price_per_slot" name="price_per_slot" min="1"
+                                    placeholder="e.g. 100" data-validate="required|min:1" data-label="Price per Slot">
+                            </div>
+                            <div class="form-group">
+                                <label for="quantity">Quantity Available</label>
+                                <input type="number" id="quantity" name="quantity" min="1" placeholder="e.g. 5">
                             </div>
                             <div class="form-group full">
                                 <label for="description">Description</label>
-                                <textarea id="description" placeholder="Brief description of this resource"></textarea>
+                                <textarea id="description" name="description"
+                                    placeholder="Brief description of this resource"></textarea>
                             </div>
                         </div>
 
@@ -63,4 +72,5 @@
     <script src="js/admin-layout.js"></script>
     <script src="js/resource-form.js"></script>
 </body>
+
 </html>

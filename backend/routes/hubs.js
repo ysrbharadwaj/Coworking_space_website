@@ -34,54 +34,54 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create hub (Admin)
-// router.post('/', async (req, res) => {
-//   try {
-//     const { name, address, city, state, country, pincode, latitude, longitude } = req.body;
-    
-//     const { data, error } = await supabase
-//       .from('working_hubs')
-//       .insert([{ name, address, city, state, country, pincode, latitude, longitude }])
-//       .select();
+router.post('/', async (req, res) => {
+  try {
+    const { name, address, city, state, country, pincode, latitude, longitude } = req.body;
 
-//     if (error) throw error;
-//     res.json({ success: true, data });
-//   } catch (error) {
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// });
+    const { data, error } = await supabase
+      .from('working_hubs')
+      .insert([{ name, address, city, state, country, pincode, latitude, longitude }])
+      .select();
 
-// // Update hub (Admin)
-// router.put('/:id', async (req, res) => {
-//   try {
-//     const { name, address, city, state, country, pincode, latitude, longitude } = req.body;
-    
-//     const { data, error } = await supabase
-//       .from('working_hubs')
-//       .update({ name, address, city, state, country, pincode, latitude, longitude })
-//       .eq('id', req.params.id)
-//       .select();
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
-//     if (error) throw error;
-//     res.json({ success: true, data });
-//   } catch (error) {
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// });
+// Update hub (Admin)
+router.put('/:id', async (req, res) => {
+  try {
+    const { name, address, city, state, country, pincode, latitude, longitude } = req.body;
 
-//  Delete hub (Admin)
-// router.delete('/:id', async (req, res) => {
-//   try {
-//     const { error } = await supabase
-//       .from('working_hubs')
-//       .delete()
-//       .eq('id', req.params.id);
+    const { data, error } = await supabase
+      .from('working_hubs')
+      .update({ name, address, city, state, country, pincode, latitude, longitude })
+      .eq('id', req.params.id)
+      .select();
 
-//     if (error) throw error;
-//     res.json({ success: true, message: 'Hub deleted successfully' });
-//   } catch (error) {
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// });
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete hub (Admin)
+router.delete('/:id', async (req, res) => {
+  try {
+    const { error } = await supabase
+      .from('working_hubs')
+      .delete()
+      .eq('id', req.params.id);
+
+    if (error) throw error;
+    res.json({ success: true, message: 'Hub deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Filter hubs by location
 router.get('/filter/location', async (req, res) => {

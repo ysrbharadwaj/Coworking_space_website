@@ -3,16 +3,33 @@ let allHubs = [];
 
 document.addEventListener('DOMContentLoaded', loadHubs);
 
+// Auto-refresh every 15 seconds
+setInterval(loadHubs, 15000);
+
+// Refresh when returning from form pages
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted || performance.navigation.type === 2) {
+        loadHubs();
+    }
+});
+
 async function loadHubs() {
     const tbody = document.getElementById('hubs-table');
     try {
         const res = await fetch(`${API_URL}/hubs`);
-        allHubs = await res.json();
+        const json = await res.json();
+        allHubs = json.data || json;
         populateCityFilter();
         renderHubs(allHubs);
+        updateTimestamp();
     } catch (err) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Failed to load hubs.</td></tr>';
     }
+}
+
+function updateTimestamp() {
+    const el = document.getElementById('last-updated');
+    if (el) el.textContent = 'Updated: ' + new Date().toLocaleTimeString();
 }
 
 function populateCityFilter() {

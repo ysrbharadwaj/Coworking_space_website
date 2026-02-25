@@ -763,7 +763,7 @@ body {
 }
 
 .price-modifier:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .modifier-info {
@@ -1181,14 +1181,89 @@ body {
     gap: 0.75rem;
 }
 
-.alert-success { background: rgba(39,174,96,.1); border-left: 4px solid var(--success); color: #1e8449; }
-.alert-error   { background: rgba(231,76,60,.1);  border-left: 4px solid var(--danger);  color: #c0392b; }
-.alert-info    { background: rgba(52,152,219,.1); border-left: 4px solid var(--accent);  color: #1a5276; }
-.alert-warning { background: rgba(243,156,18,.1); border-left: 4px solid var(--warning); color: #784212; }
+.alert-success {
+    background: rgba(39, 174, 96, .1);
+    border-left: 4px solid var(--success);
+    color: #1e8449;
+}
+
+.alert-error {
+    background: rgba(231, 76, 60, .1);
+    border-left: 4px solid var(--danger);
+    color: #c0392b;
+}
+
+.alert-info {
+    background: rgba(52, 152, 219, .1);
+    border-left: 4px solid var(--accent);
+    color: #1a5276;
+}
+
+.alert-warning {
+    background: rgba(243, 156, 18, .1);
+    border-left: 4px solid var(--warning);
+    color: #784212;
+}
 
 /* ── Workspace Rating ─────────────────────────── */
 .workspace-rating {
     display: flex;
     align-items: center;
     gap: 0.25rem;
+}
+
+/* ── Star Rating Component ─────────────────────────── */
+.star-rating {
+    display: flex;
+    gap: 0.25rem;
+    font-size: 2rem;
+    margin: 0.5rem 0;
+}
+
+.star-rating .star {
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.star-rating .star:hover,
+.star-rating .star.active {
+    color: #f39c12;
+    transform: scale(1.1);
+}
+
+.star-rating .star.active~.star {
+    color: #ddd;
+}
+
+/* ── Booking Cards with Review Button ─────────────────────────── */
+.booking-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-review {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-review:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.btn-review:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
 }

@@ -4,18 +4,34 @@ let allWorkspaces = [];
 
 document.addEventListener('DOMContentLoaded', loadResources);
 
+// Auto-refresh every 15 seconds
+setInterval(loadResources, 15000);
+
+// Refresh when returning from form pages
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted || performance.navigation.type === 2) {
+        loadResources();
+    }
+});
+
 async function loadResources() {
     try {
         [allWorkspaces, allResources] = await Promise.all([
-            fetch(`${API_URL}/workspaces`).then(r => r.json()),
-            fetch(`${API_URL}/resources`).then(r => r.json()),
+            fetch(`${API_URL}/workspaces`).then(r => r.json()).then(d => d.data || d),
+            fetch(`${API_URL}/resources`).then(r => r.json()).then(d => d.data || d),
         ]);
         populateWorkspaceFilter();
         renderResources(allResources);
+        updateTimestamp();
     } catch {
         document.getElementById('resources-table').innerHTML =
             '<tr><td colspan="7" style="text-align:center;">Failed to load resources.</td></tr>';
     }
+}
+
+function updateTimestamp() {
+    const el = document.getElementById('last-updated');
+    if (el) el.textContent = 'Updated: ' + new Date().toLocaleTimeString();
 }
 
 function populateWorkspaceFilter() {
@@ -29,10 +45,10 @@ function populateWorkspaceFilter() {
 }
 
 function filterResources() {
-    const q  = (document.getElementById('search')?.value || '').toLowerCase();
+    const q = (document.getElementById('search')?.value || '').toLowerCase();
     const ws = document.getElementById('filter-workspace')?.value || '';
     const filtered = allResources.filter(r => {
-        const matchQ  = !q  || (r.name || '').toLowerCase().includes(q);
+        const matchQ = !q || (r.name || '').toLowerCase().includes(q);
         const matchWs = !ws || String(r.workspace_id) === ws;
         return matchQ && matchWs;
     });

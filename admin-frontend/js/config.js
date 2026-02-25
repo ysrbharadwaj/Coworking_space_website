@@ -15,9 +15,20 @@ function formatStatus(status) {
 }
 
 function formatDateTime(dt) {
-    return new Date(dt).toLocaleString('en-IN', {
-        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
+    // Parse ISO string directly: "2026-02-25T21:30:00.000Z"
+    const isoString = dt.includes('T') ? dt : new Date(dt).toISOString();
+    const [datePart, timePart] = isoString.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hourMin] = timePart.split(':');
+    const hours24 = parseInt(hourMin);
+    const minutes = timePart.split(':')[1];
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthName = months[parseInt(month) - 1];
+    const ampm = hours24 >= 12 ? 'pm' : 'am';
+    const hours12 = hours24 % 12 || 12;
+
+    return `${parseInt(day)} ${monthName} ${year}, ${String(hours12).padStart(2, '0')}:${minutes} ${ampm}`;
 }
 
 function formatCurrency(n) { return `₹${Number(n).toFixed(2)}`; }
@@ -29,7 +40,7 @@ function showToast(msg, type = 'info') {
     if (!t) {
         t = document.createElement('div');
         t.id = 'admin-toast';
-        t.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;padding:1rem 1.5rem;border-radius:8px;font-weight:600;color:white;max-width:350px;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .3s;';
+        t.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;padding:1rem 1.5rem;border:1px solid;font-weight:600;color:white;max-width:350px;transition:opacity .3s;';
         document.body.appendChild(t);
     }
     const c = { success: '#27ae60', error: '#e74c3c', info: '#3498db', warning: '#f39c12' };
@@ -92,4 +103,29 @@ function clearFieldError(field) {
     field.classList.remove('input-error');
     const existing = field.parentNode.querySelector('.field-error');
     if (existing) existing.remove();
+}
+
+// ── Transactions (localStorage) ─────────────────
+
+function getTransactions() {
+    return JSON.parse(localStorage.getItem('transactions') || '[]');
+}
+
+function saveTransaction(txn) {
+    const list = getTransactions();
+    list.push(txn);
+    localStorage.setItem('transactions', JSON.stringify(list));
+}
+
+// ── Additional Formatters ──────────────────────
+
+function formatPaymentMethod(method) {
+    const m = {
+        upi: 'UPI',
+        card: 'Card',
+        netbanking: 'Net Banking',
+        wallet: 'Wallet',
+        cash: 'Cash'
+    };
+    return m[method] || method || '—';
 }

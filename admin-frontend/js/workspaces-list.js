@@ -4,18 +4,34 @@ let allHubs = [];
 
 document.addEventListener('DOMContentLoaded', loadWorkspaces);
 
+// Auto-refresh every 15 seconds
+setInterval(loadWorkspaces, 15000);
+
+// Refresh when returning from form pages
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted || performance.navigation.type === 2) {
+        loadWorkspaces();
+    }
+});
+
 async function loadWorkspaces() {
     try {
         [allHubs, allWorkspaces] = await Promise.all([
-            fetch(`${API_URL}/hubs`).then(r => r.json()),
-            fetch(`${API_URL}/workspaces`).then(r => r.json()),
+            fetch(`${API_URL}/hubs`).then(r => r.json()).then(d => d.data || d),
+            fetch(`${API_URL}/workspaces`).then(r => r.json()).then(d => d.data || d),
         ]);
         populateHubFilter();
         renderWorkspaces(allWorkspaces);
+        updateTimestamp();
     } catch {
         document.getElementById('workspaces-table').innerHTML =
             '<tr><td colspan="8" style="text-align:center;">Failed to load workspaces.</td></tr>';
     }
+}
+
+function updateTimestamp() {
+    const el = document.getElementById('last-updated');
+    if (el) el.textContent = 'Updated: ' + new Date().toLocaleTimeString();
 }
 
 function populateHubFilter() {
@@ -29,12 +45,12 @@ function populateHubFilter() {
 }
 
 function filterWorkspaces() {
-    const q    = (document.getElementById('search')?.value || '').toLowerCase();
-    const hub  = document.getElementById('filter-hub')?.value  || '';
+    const q = (document.getElementById('search')?.value || '').toLowerCase();
+    const hub = document.getElementById('filter-hub')?.value || '';
     const type = document.getElementById('filter-type')?.value || '';
     const filtered = allWorkspaces.filter(w => {
-        const matchQ    = !q    || (w.name || '').toLowerCase().includes(q);
-        const matchHub  = !hub  || String(w.hub_id) === hub;
+        const matchQ = !q || (w.name || '').toLowerCase().includes(q);
+        const matchHub = !hub || String(w.hub_id) === hub;
         const matchType = !type || w.type === type;
         return matchQ && matchHub && matchType;
     });
@@ -49,7 +65,7 @@ function hubName(id) {
 function renderWorkspaces(workspaces) {
     const tbody = document.getElementById('workspaces-table');
     if (!workspaces.length) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No workspaces found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">No workspaces found.</td></tr>';
         return;
     }
     tbody.innerHTML = workspaces.map(w => `
@@ -59,7 +75,8 @@ function renderWorkspaces(workspaces) {
             <td>${hubName(w.hub_id)}</td>
             <td>${formatType(w.type)}</td>
             <td>${w.capacity || '—'}</td>
-            <td>₹${w.base_price_per_hour || w.price_per_hour || 0}/hr</td>
+            <td>₹${w.base_price || w.price_per_hour || 0}/hr</td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${w.description || ''}">${w.description || '—'}</td>
             <td><span class="badge ${w.is_available !== false ? 'badge-success' : 'badge-danger'}">
                 ${w.is_available !== false ? 'Available' : 'Unavailable'}
             </span></td>

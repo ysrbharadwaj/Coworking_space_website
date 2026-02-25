@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,12 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     <main class="admin-main">
         <header class="admin-header">
             <h1><i class="fas fa-calendar-check"></i> Bookings</h1>
+            <span style="color:var(--text-light);font-size:.9rem;" id="last-updated"></span>
         </header>
         <div class="admin-content">
             <div class="toolbar">
@@ -40,14 +43,23 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th><th>Guest</th><th>Workspace</th><th>Hub</th>
-                                    <th>Start</th><th>End</th><th>Total</th><th>Status</th><th>Actions</th>
+                                    <th>ID</th>
+                                    <th>Guest</th>
+                                    <th>Email</th>
+                                    <th>Workspace</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Booked/Paid On</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="bookings-table">
-                                <tr><td colspan="9" style="text-align:center;">
-                                    <i class="fas fa-spinner fa-spin"></i> Loading…
-                                </td></tr>
+                                <tr>
+                                    <td colspan="9" style="text-align:center;">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading…
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -60,4 +72,5 @@
     <script src="js/admin-layout.js"></script>
     <script src="js/bookings-list.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - WorkSpace</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #f8f9fa;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .login-container {
+            background: white;
+            border: 1px solid #dfe6e9;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .login-header i {
+            font-size: 3.5rem;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+
+        .login-header h1 {
+            margin: 0;
+            font-size: 1.75rem;
+            color: #2c3e50;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-header p {
+            margin: 0.5rem 0 0 0;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1px solid #dfe6e9;
+            font-size: 1rem;
+            transition: border-color 0.15s;
+            box-sizing: border-box;
+            background: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: #3498db;
+            color: white;
+            border: 1px solid #3498db;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .btn-login:hover {
+            background: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+            border-left: 3px solid #e74c3c;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .demo-credentials {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border: 1px solid #dfe6e9;
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .demo-credentials strong {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <i class="fas fa-building"></i>
+            <h1>WorkSpace Admin</h1>
+            <p>Management System</p>
+        </div>
+
+        <div class="error-message" id="error-message"></div>
+
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+
+        <div class="demo-credentials">
+            <strong>Demo Credentials:</strong><br>
+            Username: <strong>admin</strong><br>
+            Password: <strong>admin123</strong>
+        </div>
+    </div>
+
+    <script>
+        // Check if already logged in
+        if (localStorage.getItem('adminAuth')) {
+            window.location.href = 'admin-dashboard.html';
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-message');
+
+            // Simple authentication (in production, this should be backend-based)
+            if (username === 'admin' && password === 'admin123') {
+                // Store auth token
+                localStorage.setItem('adminAuth', JSON.stringify({
+                    username: username,
+                    loginTime: new Date().toISOString(),
+                    token: btoa(username + ':' + Date.now())
+                }));
+
+                // Redirect to dashboard
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                errorMsg.textContent = 'Invalid username or password';
+                errorMsg.classList.add('show');
+
+                // Clear error after 3 seconds
+                setTimeout(() => {
+                    errorMsg.classList.remove('show');
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+
+</html>

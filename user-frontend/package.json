@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "User Frontend for CoWorking Space Platform",
   "scripts": {
-    "start": "npx http-server -p 8080 -c-1 -o",
-    "dev": "npx http-server -p 8080 -c-1"
+    "start": "npx http-server -p 8080 -c-1 -a localhost -o",
+    "dev": "npx http-server -p 8080 -c-1 -a localhost"
   },
-  "keywords": ["coworking", "frontend"],
+  "keywords": [
+    "coworking",
+    "frontend"
+  ],
   "author": "",
   "license": "ISC"
 }
