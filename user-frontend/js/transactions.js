@@ -4,6 +4,11 @@ let allTransactions = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     loadTransactions();
+    
+    // Add sample data for testing if no transactions exist
+    if (getTransactions().length === 0) {
+        addSampleTransactions();
+    }
 });
 
 function loadTransactions() {
@@ -56,4 +61,39 @@ function filterTransactions() {
         t.user_name.toLowerCase().includes(search)
     );
     displayTransactions(filtered);
+}
+
+function addSampleTransactions() {
+    const sampleTransactions = [
+        {
+            id: 'TXN001',
+            workspace_name: 'Modern Co-working Space',
+            user_name: 'John Doe',
+            amount: 1500,
+            status: 'success',
+            method: 'card',
+            date: '2026-03-01T10:30:00.000Z'
+        },
+        {
+            id: 'TXN002',
+            workspace_name: 'Business Hub Downtown',
+            user_name: 'John Doe',
+            amount: 2500,
+            status: 'success',
+            method: 'upi',
+            date: '2026-02-28T14:15:00.000Z'
+        },
+        {
+            id: 'TXN003',
+            workspace_name: 'Creative Studio',
+            user_name: 'John Doe',
+            amount: 800,
+            status: 'failed',
+            method: 'netbanking',
+            date: '2026-02-25T09:45:00.000Z'
+        }
+    ];
+    
+    sampleTransactions.forEach(txn => saveTransaction(txn));
+    loadTransactions(); // Reload to display the sample data
 }
