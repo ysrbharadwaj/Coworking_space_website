@@ -4,17 +4,35 @@ let allTransactions = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     loadTransactions();
-    
-    // Add sample data for testing if no transactions exist
-    if (getTransactions().length === 0) {
-        addSampleTransactions();
-    }
 });
 
-function loadTransactions() {
-    allTransactions = getTransactions().reverse(); // newest first
-    renderStats(allTransactions);
-    displayTransactions(allTransactions);
+async function loadTransactions() {
+    try {
+        const response = await fetch(`${API_URL}/transactions`);
+        const result = await response.json();
+        
+        if (result.success) {
+            // Map backend data to frontend format
+            allTransactions = result.data.map(txn => ({
+                id: txn.transaction_id || `TXN${txn.id}`,
+                workspace_name: txn.workspace,
+                user_name: txn.user,
+                amount: txn.amount,
+                status: txn.status,
+                method: txn.payment_method.toLowerCase(),
+                date: txn.date
+            }));
+            
+            renderStats(allTransactions);
+            displayTransactions(allTransactions);
+        } else {
+            console.error('Failed to load transactions:', result.error);
+            showError('Failed to load transactions. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error loading transactions:', error);
+        showError('Network error. Please check your connection.');
+    }
 }
 
 function renderStats(txns) {
@@ -63,37 +81,16 @@ function filterTransactions() {
     displayTransactions(filtered);
 }
 
-function addSampleTransactions() {
-    const sampleTransactions = [
-        {
-            id: 'TXN001',
-            workspace_name: 'Modern Co-working Space',
-            user_name: 'John Doe',
-            amount: 1500,
-            status: 'success',
-            method: 'card',
-            date: '2026-03-01T10:30:00.000Z'
-        },
-        {
-            id: 'TXN002',
-            workspace_name: 'Business Hub Downtown',
-            user_name: 'John Doe',
-            amount: 2500,
-            status: 'success',
-            method: 'upi',
-            date: '2026-02-28T14:15:00.000Z'
-        },
-        {
-            id: 'TXN003',
-            workspace_name: 'Creative Studio',
-            user_name: 'John Doe',
-            amount: 800,
-            status: 'failed',
-            method: 'netbanking',
-            date: '2026-02-25T09:45:00.000Z'
-        }
-    ];
-    
-    sampleTransactions.forEach(txn => saveTransaction(txn));
-    loadTransactions(); // Reload to display the sample data
+function showError(message) {
+    const container = document.getElementById('transactions-list');
+    container.innerHTML = `
+        <div class="error-message" style="text-align: center; padding: 2rem; color: var(--danger);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+            <h3>Error Loading Transactions</h3>
+            <p>${message}</p>
+            <button onclick="loadTransactions()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                <i class="fas fa-refresh"></i> Retry
+            </button>
+        </div>
+    `;
 }
