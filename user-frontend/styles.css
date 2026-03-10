@@ -1640,6 +1640,15 @@ body {
     gap: 1rem;
 }
 
+/* Google Sign-In Button Container */
+#google-signin-button-login,
+#google-signin-button-register {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .social-btn {
     flex: 1;
     padding: 0.75rem;

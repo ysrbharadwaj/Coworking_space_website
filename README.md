@@ -1,5 +1,34 @@
 # Co-Working Space Booking Platform
 
+## 🚀 Quick Start
+
+**Start both servers with one command:**
+
+### Windows
+```bash
+start.bat          # Batch file (double-click or run in CMD)
+# OR
+.\start.ps1        # PowerShell script
+```
+
+### Mac/Linux/Git Bash
+```bash
+chmod +x start.sh  # First time only
+./start.sh
+```
+
+This will:
+- ✅ Start Backend (http://localhost:3001)
+- ✅ Start Frontend (http://localhost:8080)
+- ✅ Open browser with smart redirect:
+  - **Not logged in** → Redirects to login page
+  - **Logged in** → Redirects to home page
+- ✅ Checks localStorage for authentication status
+
+📖 **See [README_STARTUP.md](README_STARTUP.md) for detailed startup instructions**
+
+---
+
 ## System Design Overview
 
 ### Architecture Pattern

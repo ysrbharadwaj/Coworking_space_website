@@ -4,6 +4,10 @@
 
 const API_URL = 'http://localhost:3001/api';
 
+// Google OAuth Configuration
+// IMPORTANT: Replace this with your actual Google Client ID from Google Cloud Console
+const GOOGLE_CLIENT_ID = '894839191711-dm93d40qebp8hrlilh5lbfucem4tpemf.apps.googleusercontent.com';
+
 // ── Formatters ─────────────────────────────────
 
 function formatType(type) {

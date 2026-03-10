@@ -163,7 +163,95 @@ async function handleRegister(event) {
 
 // Social login (placeholder for future implementation)
 function socialLogin(provider) {
-    showToast(`${provider} login coming soon!`, 'info');
+    if (provider === 'facebook') {
+        showToast('Facebook login coming soon!', 'info');
+    }
+}
+
+// Initialize Google Sign-In
+function initializeGoogleSignIn() {
+    if (typeof google === 'undefined' || !GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
+        console.warn('Google Sign-In not configured. Please set GOOGLE_CLIENT_ID in config.js');
+        return;
+    }
+
+    // Initialize Google Sign-In
+    google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCallback,
+        auto_select: false
+    });
+
+    // Render Google Sign-In button for login form
+    const loginButton = document.getElementById('google-signin-button-login');
+    if (loginButton) {
+        google.accounts.id.renderButton(
+            loginButton,
+            { 
+                theme: 'outline',
+                size: 'large',
+                width: loginButton.parentElement.offsetWidth,
+                text: 'continue_with',
+                shape: 'rectangular',
+                logo_alignment: 'left'
+            }
+        );
+    }
+
+    // Render Google Sign-In button for register form
+    const registerButton = document.getElementById('google-signin-button-register');
+    if (registerButton) {
+        google.accounts.id.renderButton(
+            registerButton,
+            { 
+                theme: 'outline',
+                size: 'large',
+                width: registerButton.parentElement.offsetWidth,
+                text: 'signup_with',
+                shape: 'rectangular',
+                logo_alignment: 'left'
+            }
+        );
+    }
+}
+
+// Handle Google OAuth callback
+async function handleGoogleCallback(response) {
+    const idToken = response.credential;
+    
+    // Show loading toast
+    showToast('Signing in with Google...', 'info');
+    
+    try {
+        const apiResponse = await fetch(`${API_URL}/auth/google`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: idToken })
+        });
+        
+        const result = await apiResponse.json();
+        
+        if (result.success) {
+            // Save user session AND JWT token
+            saveSession('currentUser', result.data);
+            saveToken(result.token);
+            localStorage.setItem('currentUser', JSON.stringify(result.data));
+            
+            showToast('Google sign-in successful! Redirecting...', 'success');
+            
+            // Redirect to home page after delay
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 1500);
+        } else {
+            showToast(result.error || 'Google sign-in failed', 'error');
+        }
+    } catch (error) {
+        console.error('Google sign-in error:', error);
+        showToast('Network error. Please try again.', 'error');
+    }
 }
 
 // Check if user is already logged in
@@ -204,6 +292,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!checkAuthStatus()) {
         // Set up form validation
         setupFormValidation();
+        
+        // Initialize Google Sign-In
+        if (typeof google !== 'undefined') {
+            initializeGoogleSignIn();
+        } else {
+            // Wait for Google SDK to load
+            window.addEventListener('load', () => {
+                if (typeof google !== 'undefined') {
+                    initializeGoogleSignIn();
+                }
+            });
+        }
     }
 });
 

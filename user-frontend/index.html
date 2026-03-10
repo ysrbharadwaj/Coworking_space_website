@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkSpace - Loading...</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+        .loader-container {
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            margin: 2rem auto;
+            animation: spin 1s linear infinite;
+        }
+        .message {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader-container">
+        <div class="logo">
+            <i class="fas fa-building"></i>
+        </div>
+        <h1>WorkSpace</h1>
+        <div class="spinner"></div>
+        <p class="message">Checking your session...</p>
+    </div>
+
+    <script>
+        // Check authentication status and redirect
+        (function() {
+            // Check localStorage for user data and token (use 'authToken' as per config.js)
+            const currentUser = localStorage.getItem('currentUser');
+            const token = localStorage.getItem('authToken');
+            
+            // Small delay for better UX (shows loading animation)
+            setTimeout(() => {
+                if (currentUser && token) {
+                    try {
+                        // Validate that the data is valid JSON
+                        const userData = JSON.parse(currentUser);
+                        if (userData && userData.email) {
+                            // User is logged in, redirect to home
+                            window.location.href = 'home.html';
+                            return;
+                        }
+                    } catch (e) {
+                        // Invalid JSON, clear and redirect to auth
+                        localStorage.removeItem('currentUser');
+                        localStorage.removeItem('authToken');
+                    }
+                }
+                
+                // User is not logged in, redirect to auth
+                window.location.href = 'auth.html';
+            }, 500);
+        })();
+    </script>
+
+        <div class="container">
+            <div class="features">
+                <h2>Why Choose WorkSpace</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <h3>Multiple Locations</h3>
+                        <p>Access premium workspaces across major cities in India</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>Flexible Booking</h3>
+                        <p>Book hourly, daily, or monthly based on your needs</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-wifi"></i>
+                        <h3>Premium Amenities</h3>
+                        <p>High-speed WiFi, AC, coffee, and more included</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Secure & Safe</h3>
+                        <p>QR code access and secure payment gateway</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Page -->
+    <section id="search" class="page">
+        <div class="container">
+            <div class="page-header">
+                <h1>Find Your Space</h1>
+                <p>Select a hub to view available workspaces</p>
+            </div>
+
+            <!-- Hubs Section -->
+            <div id="hubs-section">
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <label>City</label>
+                        <select id="filter-city" onchange="filterHubs()">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Search Hub</label>
+                        <input type="text" id="search-hub" placeholder="Search by hub name..." oninput="filterHubs()">
+                    </div>
+                </div>
+
+                <h2 style="margin: 2rem 0 1rem; color: var(--primary);">Available Hubs</h2>
+                <div id="hubs-grid" class="hubs-grid">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading hubs...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workspaces Section (Hidden initially) -->
+            <div id="workspaces-section" style="display: none;">
+                <div class="hub-header">
+                    <div class="hub-header-info">
+                        <h2 id="selected-hub-name">Workspaces</h2>
+                        <p id="selected-hub-address"></p>
+                    </div>
+                    <button class="btn-secondary" onclick="backToHubs()">
+                        <i class="fas fa-arrow-left"></i> Back to Hubs
+                    </button>
+                </div>
+
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <label>Workspace Type</label>
+                        <select id="filter-type" onchange="filterWorkspaces()">
+                            <option value="">All Types</option>
+                            <option value="hotdesk">Hot Desk</option>
+                            <option value="cabin">Private Cabin</option>
+                            <option value="meeting_room">Meeting Room</option>
+                            <option value="conference">Conference Hall</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Capacity</label>
+                        <select id="filter-capacity" onchange="filterWorkspaces()">
+                            <option value="">Any</option>
+                            <option value="1-5">1-5 people</option>
+                            <option value="6-10">6-10 people</option>
+                            <option value="11-20">11-20 people</option>
+                            <option value="21+">21+ people</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Availability</label>
+                        <select id="filter-availability" onchange="filterWorkspaces()">
+                            <option value="">All</option>
+                            <option value="available">Available Only</option>
+                            <option value="unavailable">Unavailable</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sort-by" onchange="filterWorkspaces()">
+                            <option value="">Default</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="capacity-low">Capacity: Low to High</option>
+                            <option value="capacity-high">Capacity: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="workspaces-grid" class="workspaces-grid"></div>
+        </div>
+        </div>
+    </section>
+
+    <!-- Booking Details Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>Book Workspace</h2>
+                <span class="close" onclick="closeBookingModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="workspace-details"></div>
+
+                <form id="booking-form" class="booking-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Your Name</label>
+                            <input type="text" id="user-name" required placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="user-email" required placeholder="your@email.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Booking Type</label>
+                        <select id="booking-type" required onchange="handleBookingTypeChange()">
+                            <option value="hourly">Hourly (Same day, charged per hour)</option>
+                            <option value="daily">Daily (Full days, 8 hours/day)</option>
+                            <option value="monthly">Monthly (30 days, 8 hours/day)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label id="start-label">Start Date & Time</label>
+                            <input type="datetime-local" id="start-time" required>
+                        </div>
+                        <div class="form-group">
+                            <label id="end-label">End Date & Time</label>
+                            <input type="datetime-local" id="end-time" required>
+                        </div>
+                    </div>
+
+                    <div id="booking-hint"
+                        style="padding: 0.75rem; background: #e3f2fd; border-left: 3px solid #2196F3; margin-bottom: 1rem; border-radius: 4px; font-size: 0.875rem; color: #1976D2;">
+                        <i class="fas fa-info-circle"></i> <strong>Hourly:</strong> Select start and end time on the
+                        same day. You'll be charged per hour.
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <label>Coupon Code (Optional)</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="coupon-code" placeholder="Enter coupon code" style="flex: 1;">
+                            <button type="button" class="btn-secondary" onclick="applyCoupon()"
+                                style="white-space: nowrap;">
+                                <i class="fas fa-tag"></i> Apply
+                            </button>
+                        </div>
+                        <div id="coupon-message" style="margin-top: 0.5rem; font-size: 0.875rem;"></div>
+                    </div>
+
+                    <div id="resources-section" class="resources-section">
+                        <h3>Additional Resources</h3>
+                        <div id="resources-list"></div>
+                    </div>
+
+                    <div class="pricing-summary">
+                        <div class="price-row">
+                            <span>Base Price:</span>
+                            <span id="base-price">₹0</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Resources:</span>
+                            <span id="resources-price">₹0</span>
+                        </div>
+                        <div class="price-row total">
+                            <span>Total:</span>\
+                            <span id="total-price">₹0</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-block">
+                        <i class="fas fa-credit-card"></i> Proceed to Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content medium">
+            <div class="modal-header">
+                <h2>Payment</h2>
+                <span class="close" onclick="closePaymentModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="payment-amount">
+                    <span>Total Amount</span>
+                    <h2 id="payment-amount">₹0</h2>
+                </div>
+
+                <div id="payment-breakdown" style="margin-bottom: 2rem;"></div>
+
+                <div class="payment-methods">
+                    <div class="payment-method" onclick="selectPayment('card')">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Credit/Debit Card</span>
+                    </div>
+                    <div class="payment-method" onclick="selectPayment('upi')">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>UPI</span>
+                    </div>
+                    <div class="payment-method" onclick="selectPayment('netbanking')">
+                        <i class="fas fa-university"></i>
+                        <span>Net Banking</span>
+                    </div>
+                    <div class="payment-method" onclick="selectPayment('wallet')">
+                        <i class="fas fa-wallet"></i>
+                        <span>Wallet</span>
+                    </div>
+                </div>
+
+                <div id="payment-forms">
+                    <!-- Card Form -->
+                    <div id="card-form" class="payment-form">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" placeholder="1234 5678 9012 3456" maxlength="19">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="password" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cardholder Name</label>
+                            <input type="text" placeholder="Name on card">
+                        </div>
+                        <button class="btn-primary btn-block" onclick="processPayment()">
+                            <i class="fas fa-lock"></i> Pay Securely
+                        </button>
+                    </div>
+
+                    <!-- UPI Form -->
+                    <div id="upi-form" class="payment-form">
+                        <div class="form-group">
+                            <label>UPI ID</label>
+                            <input type="text" placeholder="yourname@upi">
+                        </div>
+                        <button class="btn-primary btn-block" onclick="processPayment()">
+                            <i class="fas fa-lock"></i> Pay with UPI
+                        </button>
+                    </div>
+
+                    <!-- Net Banking Form -->
+                    <div id="netbanking-form" class="payment-form">
+                        <div class="form-group">
+                            <label>Select Bank</label>
+                            <select>
+                                <option>HDFC Bank</option>
+                                <option>ICICI Bank</option>
+                                <option>SBI</option>
+                                <option>Axis Bank</option>
+                                <option>Kotak Bank</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary btn-block" onclick="processPayment()">
+                            <i class="fas fa-lock"></i> Continue to Bank
+                        </button>
+                    </div>
+
+                    <!-- Wallet Form -->
+                    <div id="wallet-form" class="payment-form">
+                        <div class="form-group">
+                            <label>Select Wallet</label>
+                            <select>
+                                <option>Paytm</option>
+                                <option>PhonePe</option>
+                                <option>Google Pay</option>
+                                <option>Amazon Pay</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary btn-block" onclick="processPayment()">
+                            <i class="fas fa-lock"></i> Pay with Wallet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Bookings Page -->
+    <section id="bookings" class="page">
+        <div class="container">
+            <div class="page-header">
+                <h1>My Bookings</h1>
+                <p>View and manage your workspace bookings</p>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-bookings" placeholder="Search by name or email...">
+                <button class="btn-secondary" onclick="loadMyBookings()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+
+            <div id="bookings-list" class="bookings-list">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading bookings...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Transactions Page -->
+    <section id="transactions" class="page">
+        <div class="container">
+            <div class="page-header">
+                <h1>Transaction History</h1>
+                <p>View all your payment transactions</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-receipt"></i>
+                    <div>
+                        <h3 id="total-transactions">0</h3>
+                        <p>Total Transactions</p>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h3 id="successful-transactions">0</h3>
+                        <p>Successful</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-rupee-sign"></i>
+                    <div>
+                        <h3 id="total-spent">₹0</h3>
+                        <p>Total Spent</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-transactions" placeholder="Search transactions..."
+                    onkeyup="filterTransactions()">
+            </div>
+
+            <div id="transactions-list" class="transactions-list"></div>
+        </div>
+    </section>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content small">
+            <div class="modal-body center">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Payment Successful!</h2>
+                <p>Your booking has been confirmed</p>
+                <div id="qr-code-container" class="qr-code-container"></div>
+                <p class="small-text">Scan this QR code or click below to view your ticket</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;">
+                    <button class="btn-secondary" onclick="viewFullTicket()"
+                        style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-ticket-alt"></i> View Full Ticket
+                    </button>
+                    <button class="btn-primary" onclick="closeSuccessModal()">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="modal">
+        <div class="modal-content medium">
+            <div class="modal-header">
+                <h2><i class="fas fa-star"></i> Rate Your Experience</h2>
+                <span class="close" onclick="closeReviewModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="review-form" onsubmit="submitReview(event)">
+                    <input type="hidden" id="review-booking-id">
+                    <input type="hidden" id="review-workspace-id">
+
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" id="review-user-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email (Optional)</label>
+                        <input type="email" id="review-user-email">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <div class="star-rating" id="star-rating">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <input type="hidden" id="review-rating" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Review</label>
+                        <textarea id="review-text" rows="4" placeholder="Share your experience (optional)"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button type="button" class="btn-secondary" onclick="closeReviewModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-paper-plane"></i> Submit Review
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

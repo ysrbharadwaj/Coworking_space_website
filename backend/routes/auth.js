@@ -5,7 +5,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { authenticateToken, JWT_SECRET, JWT_EXPIRES_IN } = require('../middleware/auth');
 const { validate, rules, str } = require('../middleware/validate');
+const { OAuth2Client } = require('google-auth-library');
 const saltRounds = 10;
+
+// Initialize Google OAuth client
+// IMPORTANT: Set GOOGLE_CLIENT_ID in your .env file
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Register new user
 router.post('/register', async (req, res) => {
@@ -243,6 +248,126 @@ router.get('/verify', authenticateToken, async (req, res) => {
 // Logout – client should discard token; server is stateless
 router.post('/logout', (req, res) => {
   res.json({ success: true, message: 'Logged out successfully' });
+});
+
+// Google OAuth Sign-In
+router.post('/google', async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Google token is required' 
+      });
+    }
+
+    // Verify Google token
+    let ticket;
+    try {
+      ticket = await googleClient.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID
+      });
+    } catch (verifyError) {
+      console.error('Google token verification failed:', verifyError);
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Invalid Google token' 
+      });
+    }
+
+    const payload = ticket.getPayload();
+    const { email, name, sub: googleId, picture } = payload;
+
+    if (!email) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email not provided by Google' 
+      });
+    }
+
+    // Check if user already exists
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    let user;
+
+    if (checkError && checkError.code === 'PGRST116') {
+      // User doesn't exist, create new user
+      const { data: newUser, error: insertError } = await supabase
+        .from('users')
+        .insert([
+          {
+            name: name || email.split('@')[0],
+            email: email,
+            google_id: googleId,
+            profile_picture: picture,
+            created_at: new Date().toISOString()
+            // No password field for OAuth users
+          }
+        ])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Failed to create user:', insertError);
+        throw insertError;
+      }
+
+      user = newUser;
+    } else if (checkError) {
+      throw checkError;
+    } else {
+      // User exists, update Google ID if not set
+      if (!existingUser.google_id) {
+        const { data: updatedUser, error: updateError } = await supabase
+          .from('users')
+          .update({ 
+            google_id: googleId,
+            profile_picture: picture 
+          })
+          .eq('id', existingUser.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('Failed to update user:', updateError);
+          throw updateError;
+        }
+        user = updatedUser;
+      } else {
+        user = existingUser;
+      }
+    }
+
+    // Remove sensitive fields from response
+    const { password, google_id, ...userWithoutSensitiveData } = user;
+
+    // Generate JWT token
+    const jwtToken = jwt.sign(
+      { id: user.id, email: user.email, name: user.name },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+
+    res.json({ 
+      success: true, 
+      data: userWithoutSensitiveData,
+      token: jwtToken,
+      message: 'Google sign-in successful' 
+    });
+
+  } catch (err) {
+    console.error('Google OAuth error:', err);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Google sign-in failed. Please try again.' 
+    });
+  }
 });
 
 module.exports = router;
