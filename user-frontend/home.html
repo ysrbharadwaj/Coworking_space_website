@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WorkSpace - Co-Working Space Booking</title>
+    <link rel="icon" href="coworking-spaces.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -17,8 +18,9 @@
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <a href="home.html" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:10px;">
-                    <i class="fas fa-building"></i><span>WorkSpace</span>
+                <a href="home.html" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:12px;">
+                    <img src="coworking-spaces.png" alt="WorkSpace" class="site-logo">
+                    <span>WorkSpace</span>
                 </a>
             </div>
             <ul class="nav-menu">
@@ -97,7 +99,87 @@
                 </div>
             </div>
         </div>
+
+        <section class="spaces" aria-label="Featured spaces">
+            <div class="section-head">
+                <p class="section-kicker">Spaces</p>
+                <h2>Designed for focused work and meaningful meetings</h2>
+                <p>Choose a setting that matches your workflow, from quiet deep-work desks to executive meeting rooms.</p>
+            </div>
+            <div class="spaces-grid">
+                <article class="space-card">
+                    <h3>Hot Desks</h3>
+                    <p>Plug in and start quickly with ergonomic seating, high-speed internet, and shared lounge access.</p>
+                    <a href="search-hubs.html?type=hotdesk" class="link-arrow">Explore Hot Desks <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="space-card">
+                    <h3>Private Cabins</h3>
+                    <p>Quiet enclosed spaces for founders and teams that need privacy without long-term lock-in.</p>
+                    <a href="search-hubs.html?type=private_cabin" class="link-arrow">Explore Cabins <i class="fas fa-arrow-right"></i></a>
+                </article>
+                <article class="space-card">
+                    <h3>Meeting Rooms</h3>
+                    <p>Client-ready rooms with display screens, whiteboards, and seamless hourly booking.</p>
+                    <a href="search-hubs.html?type=meeting_room" class="link-arrow">Explore Rooms <i class="fas fa-arrow-right"></i></a>
+                </article>
+            </div>
+        </section>
+
+        <section class="pricing" aria-label="Pricing overview">
+            <div class="section-head">
+                <p class="section-kicker">Pricing</p>
+                <h2>Clear pricing. No hidden complexity.</h2>
+                <p>Start small or scale up. All plans include premium amenities and fast support.</p>
+            </div>
+            <div class="pricing-grid">
+                <article class="pricing-card">
+                    <p class="pricing-name">Day Pass</p>
+                    <p class="pricing-value">₹499 <span>/ day</span></p>
+                    <ul>
+                        <li>Hot desk access</li>
+                        <li>High-speed WiFi</li>
+                        <li>Coffee & lounge access</li>
+                    </ul>
+                    <a href="search-hubs.html" class="btn-secondary btn-block">Choose Day Pass</a>
+                </article>
+                <article class="pricing-card featured">
+                    <p class="pricing-name">Flexible Pro</p>
+                    <p class="pricing-value">₹3,999 <span>/ month</span></p>
+                    <ul>
+                        <li>Priority desk access</li>
+                        <li>Meeting room credits</li>
+                        <li>Extended support window</li>
+                    </ul>
+                    <a href="search-hubs.html" class="btn-primary btn-block">Choose Flexible Pro</a>
+                </article>
+                <article class="pricing-card">
+                    <p class="pricing-name">Team Suite</p>
+                    <p class="pricing-value">Custom <span>/ team</span></p>
+                    <ul>
+                        <li>Private cabins and offices</li>
+                        <li>Centralized billing</li>
+                        <li>Dedicated success manager</li>
+                    </ul>
+                    <a href="search-hubs.html" class="btn-secondary btn-block">Talk to Us</a>
+                </article>
+            </div>
+        </section>
     </div>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <h3>WorkSpace</h3>
+                <p>Premium coworking experiences for founders, creators, and distributed teams.</p>
+            </div>
+            <div class="footer-links">
+                <a href="home.html">Home</a>
+                <a href="search-hubs.html">Find Spaces</a>
+                <a href="my-bookings.html">My Bookings</a>
+                <a href="transactions.html">Transactions</a>
+            </div>
+        </div>
+    </footer>
 
     <script src="js/config.js"></script>
     <script src="js/home.js"></script>

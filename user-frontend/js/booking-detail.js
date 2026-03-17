@@ -31,7 +31,7 @@ async function loadBooking(id) {
                 <!-- Details -->
                 <div>
                     <div style="background:white;border-radius:8px;box-shadow:0 2px 10px var(--shadow);overflow:hidden;margin-bottom:1.5rem;">
-                        <div style="background:linear-gradient(135deg,var(--primary),var(--secondary));padding:1.5rem;color:white;
+                        <div style="background:var(--primary);padding:1.5rem;color:white;
                             display:flex;justify-content:space-between;align-items:center;">
                             <div>
                                 <h2 style="margin-bottom:.25rem;">${b.workspaces?.name || 'N/A'}</h2>
