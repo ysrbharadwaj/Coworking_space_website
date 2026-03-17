@@ -773,6 +773,73 @@ body, p, li, input, button, select, textarea {
     color: var(--text);
 }
 
+/* Amenities Section */
+.amenities-section {
+    margin-top: 3rem;
+    padding: 2.5rem 1.5rem;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 6px 20px var(--shadow);
+}
+
+.amenities-section h3 {
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin-bottom: 2rem;
+    font-weight: 700;
+}
+
+.amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+.amenity-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.amenity-icon {
+    width: 48px;
+    height: 48px;
+    background: #f1f1ef;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.amenity-name {
+    font-size: 1rem;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.5;
+    padding-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .amenities-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .amenities-section {
+        padding: 1.5rem 1rem;
+    }
+    
+    .amenity-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+}
+
 .workspace-footer {
     display: flex;
     justify-content: space-between;

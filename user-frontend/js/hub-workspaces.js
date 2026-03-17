@@ -75,9 +75,6 @@ function displayWorkspaces(workspaces) {
                         <span>Loading…</span>
                     </div>
                 </div>
-                <div class="amenities">
-                    ${(ws.amenities || []).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
-                </div>
                 <div class="workspace-footer">
                     <div class="price">₹${ws.base_price} <span>/hr</span></div>
                     <div style="display:flex;gap:.5rem;">
@@ -98,6 +95,9 @@ function displayWorkspaces(workspaces) {
         loadRating(ws.id);
         checkBookingStatus(ws.id);
     });
+    
+    // Display amenities section
+    displayAmenities(workspaces);
 }
 
 function bookNow(wsId) {
@@ -178,3 +178,51 @@ function filterWorkspaces() {
 
     displayWorkspaces(filtered);
 }
+
+// ── Amenities Display ──────────────────────────
+
+const amenitiesIconMap = {
+    'High-Speed Internet': 'fa-wifi',
+    'Power Backup': 'fa-battery-full',
+    'Air Conditioning': 'fa-snowflake',
+    'Modern Interiors': 'fa-home',
+    'CCTV Surveillance': 'fa-camera',
+    'Daily Housekeeping': 'fa-broom',
+    'Lounge Access': 'fa-couch',
+    'Video Conferencing': 'fa-video',
+    'Conference Rooms': 'fa-door-open',
+    '24x7 Access': 'fa-unlock',
+    '24x7 Surveillance': 'fa-eye',
+    'Housekeeping': 'fa-broom',
+    'Printing': 'fa-print',
+    'Projector': 'fa-tv',
+    'Events': 'fa-calendar-check',
+    'Accessible Commute': 'fa-location-dot',
+    'Modern Design': 'fa-palette',
+    'Lounge Area': 'fa-couch'
+};
+
+function displayAmenities(workspaces) {
+    const uniqueAmenities = [...new Set(workspaces.flatMap(w => w.amenities || []))].sort();
+    
+    if (!uniqueAmenities.length) {
+        document.getElementById('amenities-section').style.display = 'none';
+        return;
+    }
+    
+    const amenitiesGrid = document.getElementById('amenities-grid');
+    amenitiesGrid.innerHTML = uniqueAmenities.map(amenity => {
+        const icon = amenitiesIconMap[amenity] || 'fa-check';
+        return `
+            <div class="amenity-card">
+                <div class="amenity-icon">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="amenity-name">${amenity}</div>
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('amenities-section').style.display = 'block';
+}
+

@@ -56,13 +56,18 @@ async function loadWorkspace(wsId, hubId) {
                             </div>
 
                             ${ws.description ? `<p style="color:var(--text-light);margin-bottom:1rem;">${ws.description}</p>` : ''}
-
-                            <h3 style="color:var(--primary);margin-bottom:.75rem;">Amenities</h3>
-                            <div class="amenities">
-                                ${(ws.amenities || []).map(a => `<span class="amenity-tag">${a}</span>`).join('') || '<span style="color:var(--text-light);">No amenities listed</span>'}
-                            </div>
                         </div>
                     </div>
+
+                    <!-- Amenities Section -->
+                    ${(ws.amenities || []).length > 0 ? `
+                    <div style="background:white;border-radius:8px;box-shadow:0 2px 10px var(--shadow);padding:1.5rem;margin-bottom:1.5rem;">
+                        <h3 style="color:var(--primary);margin-bottom:1.5rem;">Amenities</h3>
+                        <div class="amenities-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            ${generateAmenityCards(ws.amenities)}
+                        </div>
+                    </div>
+                    ` : ''}
 
                     <!-- Hub Info -->
                     <div style="background:white;border-radius:8px;box-shadow:0 2px 10px var(--shadow);padding:1.5rem;">
@@ -121,4 +126,40 @@ async function loadWorkspace(wsId, hubId) {
         console.error('Error loading workspace:', e);
         container.innerHTML = noDataHTML('fa-exclamation-circle', 'Error loading workspace', 'Please go back and try again.');
     }
+}
+
+// Amenities icon map
+const amenitiesIconMap = {
+    'High-Speed Internet': 'fa-wifi',
+    'Power Backup': 'fa-battery-full',
+    'Air Conditioning': 'fa-snowflake',
+    'Modern Interiors': 'fa-home',
+    'CCTV Surveillance': 'fa-camera',
+    'Daily Housekeeping': 'fa-broom',
+    'Lounge Access': 'fa-couch',
+    'Video Conferencing': 'fa-video',
+    'Conference Rooms': 'fa-door-open',
+    '24x7 Access': 'fa-unlock',
+    '24x7 Surveillance': 'fa-eye',
+    'Housekeeping': 'fa-broom',
+    'Printing': 'fa-print',
+    'Projector': 'fa-tv',
+    'Events': 'fa-calendar-check',
+    'Accessible Commute': 'fa-location-dot',
+    'Modern Design': 'fa-palette',
+    'Lounge Area': 'fa-couch'
+};
+
+function generateAmenityCards(amenities) {
+    return amenities.map(amenity => {
+        const icon = amenitiesIconMap[amenity] || 'fa-check';
+        return `
+            <div class="amenity-card">
+                <div class="amenity-icon">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="amenity-name">${amenity}</div>
+            </div>
+        `;
+    }).join('');
 }
