@@ -100,7 +100,7 @@ function renderRevenueByHub(bookings, hubs, workspaces) {
 function renderBookingsByStatus(bookings) {
     const el = document.getElementById('bookings-by-status');
     const statuses = ['confirmed', 'completed', 'pending', 'cancelled', 'checked_in'];
-    const colors = { confirmed: '#27ae60', completed: '#2980b9', pending: '#f39c12', cancelled: '#e74c3c', checked_in: '#8e44ad' };
+    const colors = { confirmed: '#3f7d5b', completed: '#6B7D5C', pending: '#a67c2f', cancelled: '#b4493c', checked_in: '#C6A969' };
     const total = bookings.length || 1;
     el.innerHTML = statuses.map(s => {
         const count = bookings.filter(b => b.status === s).length;
@@ -138,7 +138,7 @@ function renderRevenueByType(bookings, workspaces) {
                 <strong>${formatCurrency(d.revenue)}</strong>
             </div>
             <div style="background:var(--border);height:8px;border-radius:4px;overflow:hidden;">
-                <div style="background:#8e44ad;height:8px;width:${Math.round(d.revenue / maxRevenue * 100)}%;"></div>
+                <div style="background:#6B7D5C;height:8px;width:${Math.round(d.revenue / maxRevenue * 100)}%;"></div>
             </div>
         </div>
     `).join('');

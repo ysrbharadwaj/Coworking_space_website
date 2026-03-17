@@ -35,7 +35,7 @@ async function loadWorkspace(wsId, hubId) {
                 <!-- Left: Info -->
                 <div>
                     <div style="background:white;border-radius:8px;box-shadow:0 2px 10px var(--shadow);overflow:hidden;margin-bottom:1.5rem;">
-                        <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);padding:2rem;color:white;">
+                        <div style="background:var(--primary);padding:2rem;color:white;">
                             <h1 style="font-size:1.75rem;margin-bottom:.5rem;">${ws.name}</h1>
                             <p style="opacity:.85;"><i class="fas fa-map-marker-alt"></i>
                                 ${ws.working_hubs?.name || 'N/A'}, ${ws.working_hubs?.city || 'N/A'}</p>

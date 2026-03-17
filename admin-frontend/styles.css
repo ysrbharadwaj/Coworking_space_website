@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* =====================================================
-   Admin Dashboard – Professional CRM Style  
-   ===================================================== */
+    Admin Dashboard – Professional CRM Style  
+    ===================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -8,29 +10,41 @@
 }
 
 :root {
-    --primary: #2c3e50;
-    --secondary: #34495e;
-    --accent: #3498db;
-    --success: #27ae60;
-    --danger: #e74c3c;
-    --warning: #f39c12;
-    --light: #ecf0f1;
-    --dark: #2c3e50;
-    --border: #dfe6e9;
-    --shadow: rgba(0, 0, 0, .1);
-    --text: #2c3e50;
-    --text-light: #7f8c8d;
+    --primary: #0B0B0C;
+    --secondary: #111111;
+    --accent: #C6A969;
+    --accent-soft: #6B7D5C;
+    --success: #3f7d5b;
+    --danger: #b4493c;
+    --warning: #a67c2f;
+    --light: #F5F5F5;
+    --surface: #FAFAF9;
+    --dark: #111111;
+    --border: #E8E5DF;
+    --shadow: rgba(11, 11, 12, .06);
+    --text: #111111;
+    --text-light: #6A6A68;
     --sidebar-width: 220px;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.6;
     color: var(--text);
-    background: #f8f9fa;
+    background: var(--surface);
     display: flex;
     min-height: 100vh;
 }
+
+/* Typography - Admin */
+h1, h2, h3 { font-family: 'Clash Display', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+h1, h2, h3 { font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+h1 { font-size: clamp(1.4rem, 2.2vw, 2.2rem); font-weight:800; letter-spacing:-0.45px; }
+h2 { font-size: 1.1rem; font-weight:700; letter-spacing:-0.2px; }
+p, label, button, input, td, th { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+
+/* Stronger admin heading */
+.admin-header h1 { font-family: 'Plus Jakarta Sans', Inter, sans-serif; font-weight:800; font-size:1.6rem; }
 
 /* ── Sidebar ──────────────────────────────────── */
 .admin-sidebar {
@@ -46,7 +60,7 @@ body {
     flex-direction: column;
     z-index: 100;
     border-right: 1px solid var(--border);
-    box-shadow: 2px 0 10px var(--shadow);
+    box-shadow: 1px 0 0 var(--border);
 }
 
 .sidebar-brand {
@@ -56,7 +70,8 @@ body {
     align-items: center;
     gap: .75rem;
     font-size: 1.3rem;
-    font-weight: 700;
+    font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+    font-weight: 800;
     color: var(--primary);
 }
 
@@ -84,16 +99,16 @@ body {
 }
 
 .sidebar-nav a:hover {
-    background: #f8f9fa;
-    color: var(--accent);
+    background: #f3f2ef;
+    color: var(--primary);
     border-left-color: var(--accent);
 }
 
 .sidebar-nav a.active {
-    background: rgba(52, 152, 219, .08);
-    color: var(--accent);
+    background: rgba(198, 169, 105, .12);
+    color: var(--primary);
     border-left-color: var(--accent);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .sidebar-nav a i {
@@ -111,8 +126,9 @@ body {
 }
 
 .admin-header {
-    background: white;
-    padding: 1rem 2rem;
+    background: rgba(250, 250, 249, 0.9);
+    backdrop-filter: blur(8px);
+    padding: 1.15rem 2.25rem;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
@@ -123,12 +139,14 @@ body {
 }
 
 .admin-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     color: var(--primary);
+    letter-spacing: -0.4px;
+    font-weight: 800;
 }
 
 .admin-content {
-    padding: 2rem;
+    padding: 2.5rem;
     flex: 1;
 }
 
@@ -136,15 +154,16 @@ body {
 .card {
     background: white;
     border: 1px solid var(--border);
-    box-shadow: 0 1px 3px var(--shadow);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px var(--shadow);
     overflow: hidden;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.9rem;
 }
 
 .card-header {
-    padding: 1rem 1.5rem;
+    padding: 1.15rem 1.6rem;
     border-bottom: 2px solid var(--border);
-    background: #fafbfc;
+    background: #f3f2ef;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -153,28 +172,29 @@ body {
 .card-header h2 {
     font-size: 1rem;
     color: var(--primary);
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: .5px;
 }
 
 .card-body {
-    padding: 1.5rem;
+    padding: 1.8rem;
 }
 
 /* ── Stat Cards ───────────────────────────────── */
 .stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 2rem;
+    gap: 1.6rem;
+    margin-bottom: 2.4rem;
 }
 
 .stat-card {
     background: white;
     border: 1px solid var(--border);
     padding: 1.5rem;
-    box-shadow: 0 1px 3px var(--shadow);
+    border-radius: 12px;
+    box-shadow: 0 8px 22px var(--shadow);
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -213,7 +233,7 @@ body {
 
 .stat-card .value {
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--primary);
 }
 
@@ -291,7 +311,7 @@ tbody tr:last-child td {
 }
 
 .badge-info {
-    background: #3498db;
+    background: var(--accent-soft);
     color: white;
 }
 
@@ -313,34 +333,35 @@ tbody tr:last-child td {
     padding: .65rem 1.25rem;
     border: 1px solid transparent;
     font-size: .9rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all .15s;
+    transition: all .28s ease-in-out;
     text-decoration: none;
 }
 
 .btn-primary,
 .btn {
-    background: var(--accent);
+    background: var(--primary);
     color: white;
-    border-color: var(--accent);
+    border-color: var(--primary);
 }
 
 .btn-primary:hover,
 .btn:hover {
-    background: #2980b9;
-    border-color: #2980b9;
+    background: #1c1c1d;
+    border-color: #1c1c1d;
+    transform: translateY(-1px);
 }
 
 .btn-secondary {
-    background: #ecf0f1;
+    background: white;
     color: var(--text);
-    border-color: #ecf0f1;
+    border-color: var(--border);
 }
 
 .btn-secondary:hover {
-    background: #dfe6e9;
-    border-color: #dfe6e9;
+    background: #f3f2ef;
+    border-color: #d9d5cc;
 }
 
 .btn-danger {
@@ -355,14 +376,14 @@ tbody tr:last-child td {
 }
 
 .btn-success {
-    background: var(--success);
+    background: var(--accent-soft);
     color: white;
-    border-color: var(--success);
+    border-color: var(--accent-soft);
 }
 
 .btn-success:hover {
-    background: #219a52;
-    border-color: #219a52;
+    background: #5c6c50;
+    border-color: #5c6c50;
 }
 
 .btn-outline {
@@ -436,6 +457,7 @@ tbody tr:last-child td {
 .form-group select:focus,
 .form-group textarea:focus {
     border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(198, 169, 105, 0.18);
 }
 
 .input-error {
@@ -473,7 +495,8 @@ tbody tr:last-child td {
     padding: 1rem 1.25rem;
     background: white;
     border: 1px solid var(--border);
-    box-shadow: 0 1px 3px var(--shadow);
+    border-radius: 12px;
+    box-shadow: 0 8px 22px var(--shadow);
     margin-bottom: 1.5rem;
 }
 
@@ -589,9 +612,9 @@ tbody tr:last-child td {
 
 .page-btn:hover,
 .page-btn.active {
-    background: var(--accent);
+    background: var(--primary);
     color: white;
-    border-color: var(--accent);
+    border-color: var(--primary);
 }
 
 /* ── Responsive ───────────────────────────────── */
@@ -630,5 +653,89 @@ tbody tr:last-child td {
     .toolbar {
         flex-direction: column;
         align-items: stretch;
+    }
+}
+
+/* ── Premium Polish Pass ───────────────────────────── */
+:root {
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --ring: 0 0 0 3px rgba(198, 169, 105, 0.22);
+}
+
+body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+.admin-content {
+    padding: 2.75rem;
+}
+
+.admin-header {
+    border-bottom: 1px solid var(--border);
+}
+
+.admin-header h1 {
+    letter-spacing: -0.45px;
+}
+
+.card,
+.stat-card,
+.toolbar,
+.toolbar-search,
+.page-btn,
+.form-group input,
+.form-group select,
+.form-group textarea,
+.toolbar-filter select {
+    border-radius: var(--radius-sm);
+}
+
+.card,
+.stat-card,
+.toolbar {
+    box-shadow: 0 10px 24px rgba(11, 11, 12, 0.07);
+}
+
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-success,
+.btn-outline {
+    min-height: 40px;
+    letter-spacing: -0.1px;
+}
+
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-danger:focus-visible,
+.btn-success:focus-visible,
+.btn-outline:focus-visible,
+.form-group input:focus-visible,
+.form-group select:focus-visible,
+.form-group textarea:focus-visible,
+.page-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+}
+
+table {
+    font-size: 0.93rem;
+}
+
+thead th {
+    letter-spacing: 0.01em;
+}
+
+tbody tr:hover {
+    background: #f7f4ee;
+}
+
+@media(max-width:900px) {
+    .admin-content {
+        padding: 1.5rem;
     }
 }
