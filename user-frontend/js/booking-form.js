@@ -2,6 +2,7 @@
 
 let currentWorkspace = null;
 let selectedResources = [];
+let currentAvailability = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!requireAuth()) return;
@@ -110,6 +111,93 @@ function updateResourceQty(id, price, name) {
 // ── Pricing ────────────────────────────────────
 
 function onScheduleChange() { updatePricing(); }
+
+function renderAvailability(message, kind = 'info') {
+    const el = document.getElementById('availability-status');
+    if (!el) return;
+
+    if (!message) {
+        el.style.display = 'none';
+        el.textContent = '';
+        el.className = 'alert alert-info';
+        return;
+    }
+
+    el.style.display = 'flex';
+    el.className = `alert alert-${kind}`;
+    el.innerHTML = message;
+}
+
+async function checkAvailability() {
+    const start = document.getElementById('start-time').value;
+    const end = document.getElementById('end-time').value;
+
+    if (!currentWorkspace || !start || !end) {
+        currentAvailability = null;
+        renderAvailability('Select start and end time to check live availability.', 'info');
+        return null;
+    }
+
+    if (new Date(end) <= new Date(start)) {
+        currentAvailability = null;
+        renderAvailability('<i class="fas fa-exclamation-triangle"></i><span><strong>Invalid range:</strong> End time must be after start time.</span>', 'error');
+        return null;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/bookings/availability`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                workspace_id: currentWorkspace.id,
+                start_time: start,
+                end_time: end
+            })
+        });
+
+        const result = await res.json();
+        if (!res.ok || !result.success) throw new Error(result.error || 'Availability check failed');
+
+        currentAvailability = result.data;
+
+        if (result.data.available) {
+            renderAvailability('<i class="fas fa-circle-check"></i><span><strong>Available:</strong> Slot is currently free. Proceed quickly to hold it.</span>', 'success');
+        } else if (result.data.has_hold_conflict) {
+            renderAvailability('<i class="fas fa-hourglass-half"></i><span><strong>Temporarily unavailable:</strong> Another user is currently holding this slot.</span>', 'warning');
+        } else {
+            renderAvailability('<i class="fas fa-ban"></i><span><strong>Unavailable:</strong> This slot is already booked.</span>', 'error');
+        }
+
+        return result.data;
+    } catch (e) {
+        currentAvailability = null;
+        renderAvailability(`<i class="fas fa-wifi"></i><span><strong>Could not verify live availability:</strong> ${e.message}</span>`, 'warning');
+        return null;
+    }
+}
+
+async function createSlotHold() {
+    const start = document.getElementById('start-time').value;
+    const end = document.getElementById('end-time').value;
+
+    const res = await fetch(`${API_URL}/bookings/holds`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+            workspace_id: currentWorkspace.id,
+            start_time: start,
+            end_time: end,
+            ttl_seconds: 600
+        })
+    });
+
+    const result = await res.json();
+    if (!res.ok || !result.success) {
+        throw new Error(result.error || 'Could not hold slot');
+    }
+
+    return result.data;
+}
 
 async function updatePricing() {
     if (!currentWorkspace) return;
@@ -230,6 +318,7 @@ async function updatePricing() {
         </div>`;
 
         summary.innerHTML = html;
+        await checkAvailability();
 
     } catch (e) {
         const base = currentWorkspace.base_price;
@@ -238,12 +327,13 @@ async function updatePricing() {
             <div class="price-row"><span>Base Price:</span><span id="base-price">₹${base}</span></div>
             <div class="price-row"><span>Resources:</span><span id="resources-price">₹${res}</span></div>
             <div class="price-row total"><span>Total:</span><span id="total-price">₹${base + res}</span></div>`;
+        await checkAvailability();
     }
 }
 
 // ── Submit ─────────────────────────────────────
 
-function handleSubmit(e) {
+async function handleSubmit(e) {
     e.preventDefault();
 
     // Run validation
@@ -258,6 +348,21 @@ function handleSubmit(e) {
     // Extra cross-field check
     if (new Date(end) <= new Date(start)) {
         showToast('End time must be after start time.', 'error');
+        return;
+    }
+
+    const availability = await checkAvailability();
+    if (!availability || !availability.available) {
+        showToast('Selected slot is not available. Please pick another time.', 'error');
+        return;
+    }
+
+    let holdData;
+    try {
+        holdData = await createSlotHold();
+    } catch (err) {
+        showToast(err.message || 'Failed to lock slot. Please try another time.', 'error');
+        await checkAvailability();
         return;
     }
 
@@ -278,6 +383,8 @@ function handleSubmit(e) {
         end_time:      end,
         booking_type:  document.getElementById('booking-type').value,
         total_price:   total,
+        hold_token:    holdData.hold_token,
+        hold_expires_at: holdData.expires_at,
         resources:     selectedResources.map(r => ({ id: r.id, quantity: r.quantity })),
         pricing_html:  document.getElementById('pricing-summary').innerHTML
     });

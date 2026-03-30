@@ -1,9 +1,25 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const { supabase } = require('../config/supabase');
 const { calculateDynamicPrice } = require('../utils/pricing');
 const { authenticateToken } = require('../middleware/auth');
 const { validate, rules } = require('../middleware/validate');
+
+const ACTIVE_BOOKING_STATUSES = ['confirmed', 'checked_in'];
+const DEFAULT_HOLD_TTL_SECONDS = 10 * 60;
+
+function buildSlotKey(workspaceId, startTime, endTime) {
+  return `${workspaceId}:${new Date(startTime).toISOString()}:${new Date(endTime).toISOString()}`;
+}
+
+async function cleanupExpiredHolds() {
+  await supabase
+    .from('booking_holds')
+    .update({ is_active: false, status: 'expired' })
+    .eq('is_active', true)
+    .lt('expires_at', new Date().toISOString());
+}
 
 // Get current user's bookings (protected)
 router.get('/my', authenticateToken, async (req, res) => {
@@ -71,6 +87,179 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Real-time availability check (bookings + active holds)
+router.post('/availability', authenticateToken, async (req, res) => {
+  try {
+    const { workspace_id, start_time, end_time } = req.body;
+
+    const err = validate(req.body, {
+      workspace_id: [rules.required, rules.positiveInt],
+      start_time: [rules.required, rules.isoDate],
+      end_time: [rules.required, rules.isoDate, rules.after('start_time')]
+    });
+    if (err) return res.status(400).json({ success: false, error: err });
+
+    await cleanupExpiredHolds();
+
+    const { data: bookingConflict, error: bookingErr } = await supabase
+      .from('bookings')
+      .select('id, start_time, end_time, status')
+      .eq('workspace_id', workspace_id)
+      .in('status', ACTIVE_BOOKING_STATUSES)
+      .lt('start_time', end_time)
+      .gt('end_time', start_time)
+      .limit(1);
+
+    if (bookingErr) throw bookingErr;
+
+    const { data: holdConflict, error: holdErr } = await supabase
+      .from('booking_holds')
+      .select('id, start_time, end_time, user_email, expires_at')
+      .eq('workspace_id', workspace_id)
+      .eq('is_active', true)
+      .gt('expires_at', new Date().toISOString())
+      .neq('user_email', req.user.email)
+      .lt('start_time', end_time)
+      .gt('end_time', start_time)
+      .limit(1);
+
+    if (holdErr) throw holdErr;
+
+    const hasBookingConflict = Array.isArray(bookingConflict) && bookingConflict.length > 0;
+    const hasHoldConflict = Array.isArray(holdConflict) && holdConflict.length > 0;
+
+    return res.json({
+      success: true,
+      data: {
+        available: !hasBookingConflict && !hasHoldConflict,
+        has_booking_conflict: hasBookingConflict,
+        has_hold_conflict: hasHoldConflict,
+        conflict: hasBookingConflict ? 'booking' : (hasHoldConflict ? 'hold' : null)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Create a temporary slot hold to prevent race conditions before payment
+router.post('/holds', authenticateToken, async (req, res) => {
+  try {
+    const { workspace_id, start_time, end_time, ttl_seconds } = req.body;
+
+    const err = validate(req.body, {
+      workspace_id: [rules.required, rules.positiveInt],
+      start_time: [rules.required, rules.isoDate, rules.futureDate, rules.maxFutureDays(90)],
+      end_time: [rules.required, rules.isoDate, rules.after('start_time'), rules.maxDuration(720)]
+    });
+    if (err) return res.status(400).json({ success: false, error: err });
+
+    await cleanupExpiredHolds();
+
+    const slotKey = buildSlotKey(workspace_id, start_time, end_time);
+
+    // Reuse active hold for same user/slot if it already exists
+    const { data: existingHold, error: existingErr } = await supabase
+      .from('booking_holds')
+      .select('hold_token, expires_at')
+      .eq('slot_key', slotKey)
+      .eq('user_email', req.user.email)
+      .eq('is_active', true)
+      .gt('expires_at', new Date().toISOString())
+      .maybeSingle();
+
+    if (existingErr) throw existingErr;
+
+    if (existingHold) {
+      return res.json({
+        success: true,
+        data: {
+          hold_token: existingHold.hold_token,
+          expires_at: existingHold.expires_at,
+          reused: true
+        }
+      });
+    }
+
+    const { data: bookingConflict, error: bookingErr } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('workspace_id', workspace_id)
+      .in('status', ACTIVE_BOOKING_STATUSES)
+      .lt('start_time', end_time)
+      .gt('end_time', start_time)
+      .limit(1);
+
+    if (bookingErr) throw bookingErr;
+    if (bookingConflict && bookingConflict.length > 0) {
+      return res.status(409).json({
+        success: false,
+        error: 'This slot is no longer available. Please choose another time.'
+      });
+    }
+
+    const safeTtl = Math.max(60, Math.min(Number(ttl_seconds) || DEFAULT_HOLD_TTL_SECONDS, 20 * 60));
+    const expiresAt = new Date(Date.now() + safeTtl * 1000).toISOString();
+    const holdToken = crypto.randomUUID();
+
+    const { data: hold, error: holdErr } = await supabase
+      .from('booking_holds')
+      .insert([{
+        hold_token: holdToken,
+        workspace_id,
+        user_email: req.user.email,
+        start_time,
+        end_time,
+        slot_key: slotKey,
+        expires_at: expiresAt,
+        is_active: true,
+        status: 'active'
+      }])
+      .select('hold_token, expires_at')
+      .single();
+
+    if (holdErr) {
+      if (holdErr.code === '23505' || holdErr.code === '23P01') {
+        return res.status(409).json({
+          success: false,
+          error: 'This slot is currently held by another user. Try again in a moment.'
+        });
+      }
+      throw holdErr;
+    }
+
+    res.json({ success: true, data: hold });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Release a hold explicitly (optional, e.g. user abandons checkout)
+router.delete('/holds/:holdToken', authenticateToken, async (req, res) => {
+  try {
+    const { holdToken } = req.params;
+
+    const { data, error } = await supabase
+      .from('booking_holds')
+      .update({ is_active: false, status: 'released' })
+      .eq('hold_token', holdToken)
+      .eq('user_email', req.user.email)
+      .eq('is_active', true)
+      .select('hold_token')
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) {
+      return res.status(404).json({ success: false, error: 'Hold not found or already inactive' });
+    }
+
+    res.json({ success: true, message: 'Hold released successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Get booking by ID
 router.get('/:id', async (req, res) => {
   try {
@@ -123,6 +312,7 @@ router.post('/', authenticateToken, async (req, res) => {
       workspace_id,
       start_time,
       end_time,
+      hold_token,
       total_price,
       booking_type,
       status,
@@ -139,8 +329,34 @@ router.post('/', authenticateToken, async (req, res) => {
       start_time:    [rules.required, rules.isoDate, rules.futureDate, rules.maxFutureDays(90)],
       end_time:      [rules.required, rules.isoDate, rules.after('start_time'), rules.maxDuration(720)],
       booking_type:  [rules.oneOf(['hourly', 'daily', 'monthly'])],
+      hold_token:    [rules.required],
     });
     if (err) return res.status(400).json({ success: false, error: err });
+
+    await cleanupExpiredHolds();
+
+    const slotKey = buildSlotKey(workspace_id, start_time, end_time);
+
+    const { data: hold, error: holdErr } = await supabase
+      .from('booking_holds')
+      .select('id, hold_token, expires_at, workspace_id, start_time, end_time, slot_key, user_email')
+      .eq('hold_token', hold_token)
+      .eq('user_email', req.user.email)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (holdErr) throw holdErr;
+    if (!hold) {
+      return res.status(409).json({ success: false, error: 'Booking hold is missing or expired. Please retry.' });
+    }
+
+    if (
+      hold.workspace_id !== Number(workspace_id) ||
+      hold.slot_key !== slotKey ||
+      new Date(hold.expires_at) <= new Date()
+    ) {
+      return res.status(409).json({ success: false, error: 'Booking hold is no longer valid for this slot.' });
+    }
 
     // Validate resources array items if provided
     if (resources && !Array.isArray(resources)) {
@@ -230,6 +446,7 @@ router.post('/', authenticateToken, async (req, res) => {
       .from('bookings')
       .insert([{
         workspace_id,
+        slot_key: slotKey,
         user_name,
         user_email,
         start_time,
@@ -243,7 +460,15 @@ router.post('/', authenticateToken, async (req, res) => {
       .select()
       .single();
 
-    if (bookingError) throw bookingError;
+    if (bookingError) {
+      if (bookingError.code === '23505' || bookingError.code === '23P01') {
+        return res.status(409).json({
+          success: false,
+          error: 'This time slot was just booked by someone else. Please choose another slot.'
+        });
+      }
+      throw bookingError;
+    }
 
     console.log('✅ Booking Created Successfully!');
     console.log('Booking ID:', booking.id);
@@ -264,6 +489,12 @@ router.post('/', authenticateToken, async (req, res) => {
 
       if (resourcesError) throw resourcesError;
     }
+
+    await supabase
+      .from('booking_holds')
+      .update({ is_active: false, status: 'consumed', consumed_at: new Date().toISOString() })
+      .eq('hold_token', hold_token)
+      .eq('is_active', true);
 
     console.log('📤 RESPONSE TO FRONTEND:');
     console.log(JSON.stringify({ success: true, data: booking }, null, 2));

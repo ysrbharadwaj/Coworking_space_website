@@ -27,6 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         </div>`;
     }
+
+    if (bookingData.hold_expires_at) {
+        const holdExpiry = new Date(bookingData.hold_expires_at);
+        const expiryText = Number.isNaN(holdExpiry.getTime()) ? 'soon' : formatDateTime(holdExpiry.toISOString());
+        bd.innerHTML += `<div class="alert alert-warning" style="margin-top:1rem;">
+            <i class="fas fa-hourglass-half"></i>
+            <span><strong>Slot reserved temporarily:</strong> Complete payment before ${expiryText}.</span>
+        </div>`;
+    }
 });
 
 // ── Payment Method Selection ───────────────────
@@ -81,6 +90,7 @@ async function processPayment(method) {
                 workspace_id: bookingData.workspace_id,
                 start_time:   bookingData.start_time,
                 end_time:     bookingData.end_time,
+                hold_token:   bookingData.hold_token,
                 total_price:  bookingData.total_price,
                 booking_type: bookingData.booking_type,
                 status:       'confirmed',
