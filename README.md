@@ -1,6 +1,6 @@
 # Co-Working Space Booking Platform
 
-## 🚀 Quick Start
+##  Quick Start
 
 **Start both servers with one command:**
 
@@ -18,14 +18,14 @@ chmod +x start.sh  # First time only
 ```
 
 This will:
-- ✅ Start Backend (http://localhost:3001)
-- ✅ Start Frontend (http://localhost:8080)
-- ✅ Open browser with smart redirect:
+-  Start Backend (http://localhost:3001)
+-  Start Frontend (http://localhost:8080)
+-  Open browser with smart redirect:
   - **Not logged in** → Redirects to login page
   - **Logged in** → Redirects to home page
-- ✅ Checks localStorage for authentication status
+-  Checks localStorage for authentication status
 
-📖 **See [README_STARTUP.md](README_STARTUP.md) for detailed startup instructions**
+ **See [README_STARTUP.md](README_STARTUP.md) for detailed startup instructions**
 
 ---
 
@@ -604,67 +604,67 @@ npm run start-all
 ## 📱 Features Implemented
 
 ### User Frontend
-✅ **Space Discovery & Search**
+ **Space Discovery & Search**
 - Filter by location (city, state)
 - Filter by workspace type (meeting room, cabin, hot desk, conference)
 - Filter by capacity and price range
 - Filter by amenities (Wi-Fi, AC, Coffee, Parking, etc.)
 
-✅ **Booking Flow**
+ **Booking Flow**
 - Select date, start time, and end time
 - Choose booking type (hourly, daily, monthly)
 - Real-time availability checking
 - Dynamic price calculation
 
-✅ **Resource Booking**
+ **Resource Booking**
 - View available resources per workspace
 - Add optional resources (projector, locker, parking, snacks)
 - See resource availability and pricing
 
-✅ **My Bookings**
+ **My Bookings**
 - Search bookings by name (no login required)
 - View booking details and status
 - Cancel bookings
 - View QR codes for check-in
 
-✅ **QR Check-in**
+ **QR Check-in**
 - Unique QR code generated for each booking
 - Display QR code for workspace access
 
 ### Admin Frontend
-✅ **Dashboard**
+ **Dashboard**
 - Overview stats (total hubs, workspaces, bookings, revenue)
 - Recent bookings list
 
-✅ **Hub Management**
+ **Hub Management**
 - Create, read, update, delete working hubs
 - Manage location details
 
-✅ **Workspace Management**
+ **Workspace Management**
 - Create, read, update, delete workspaces
 - Set workspace type, capacity, price
 - Configure amenities
 
-✅ **Resource Management**
+ **Resource Management**
 - Create, read, update, delete resources
 - Set resource pricing and availability
 
-✅ **Booking Management**
+ **Booking Management**
 - View all bookings
 - Filter by status (confirmed, checked_in, cancelled)
 - View booking details
 
-✅ **Pricing Rules**
+ **Pricing Rules**
 - Create dynamic pricing rules
 - Configure demand-based, peak hours, weekend pricing
 - Set percentage or flat modifiers
 
-✅ **QR Code Management**
+ **QR Code Management**
 - View all generated QR codes
 - Track scanned/unscanned status
 
 ### Backend API
-✅ **Comprehensive REST API**
+ **Comprehensive REST API**
 - Working Hubs endpoints
 - Workspaces with advanced filtering
 - Resources with availability checking
@@ -674,7 +674,7 @@ npm run start-all
 
 ---
 
-## 🔑 API Endpoints
+##  API Endpoints
 
 ### Working Hubs
 - `GET /api/hubs` - Get all hubs
@@ -726,7 +726,7 @@ npm run start-all
 
 ---
 
-## 💡 How to Use
+##  How to Use
 
 ### For Users:
 1. **Browse Workspaces**: Use the search and filter options to find the perfect workspace
