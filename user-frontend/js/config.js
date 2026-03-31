@@ -1,14 +1,6 @@
-// ================================================
-// Shared Configuration & Utility Functions
-// ================================================
-
 const API_URL = 'http://localhost:3001/api';
 
-// Google OAuth Configuration
-// IMPORTANT: Replace this with your actual Google Client ID from Google Cloud Console
 const GOOGLE_CLIENT_ID = '894839191711-dm93d40qebp8hrlilh5lbfucem4tpemf.apps.googleusercontent.com';
-
-// ── Formatters ─────────────────────────────────
 
 function formatType(type) {
     const types = {
@@ -41,7 +33,6 @@ function formatPaymentMethod(method) {
 }
 
 function formatDateTime(dateTime) {
-    // Parse ISO string directly: "2026-02-25T21:30:00.000Z"
     const isoString = dateTime.includes('T') ? dateTime : new Date(dateTime).toISOString();
     const [datePart, timePart] = isoString.split('T');
     const [year, month, day] = datePart.split('-');
@@ -61,8 +52,6 @@ function formatCurrency(amount) {
     return `₹${Number(amount).toFixed(2)}`;
 }
 
-// ── Star Rating ─────────────────────────────────
-
 function generateStars(rating) {
     const full = Math.floor(rating);
     const half = rating % 1 >= 0.5;
@@ -73,8 +62,6 @@ function generateStars(rating) {
         '<i class="far fa-star" style="color:#f39c12;"></i>'.repeat(empty)
     );
 }
-
-// ── Session / LocalStorage Helpers ─────────────
 
 function saveSession(key, value) {
     sessionStorage.setItem(key, JSON.stringify(value));
@@ -88,8 +75,6 @@ function getSession(key) {
 function clearSession(key) {
     sessionStorage.removeItem(key);
 }
-
-// ── Authentication Helpers ──────────────────────
 
 /** Save JWT token to localStorage (persists across browser sessions) */
 function saveToken(token) {
@@ -125,14 +110,11 @@ function requireAuth() {
         window.location.href = 'auth.html';
         return null;
     }
-    // Refresh sessionStorage in case we're in a new tab
     if (!getSession('currentUser')) {
         saveSession('currentUser', user);
     }
-    // Hide loading overlay if present, reveal page content
     const overlay = document.getElementById('auth-loading-overlay');
     if (overlay) overlay.style.display = 'none';
-    // Auto-populate navbar user info
     initNavUser(user);
     return user;
 }
@@ -172,7 +154,6 @@ function toggleUserMenu() {
     dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
 }
 
-// Close dropdown when clicking outside
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.nav-user')) {
         const dd = document.getElementById('user-dropdown');
@@ -180,10 +161,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-/**
- * Returns fetch headers including the Authorization Bearer token.
- * Always includes Content-Type: application/json.
- */
 function getAuthHeaders() {
     const token = getToken();
     return {
@@ -192,7 +169,6 @@ function getAuthHeaders() {
     };
 }
 
-/** Log the current user out and redirect to auth page. */
 function logout() {
     clearToken();
     clearSession('currentUser');
@@ -203,13 +179,9 @@ function logout() {
     window.location.href = 'auth.html';
 }
 
-// ── URL Params ──────────────────────────────────
-
 function getParam(name) {
     return new URLSearchParams(window.location.search).get(name);
 }
-
-// ── Toast / Alert Helper ────────────────────────
 
 function showToast(message, type = 'info') {
     let toast = document.getElementById('ws-toast');
@@ -232,8 +204,6 @@ function showToast(message, type = 'info') {
     toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 3500);
 }
 
-// ── Loading Placeholder ─────────────────────────
-
 function loadingHTML(msg = 'Loading...') {
     return `<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>${msg}</p></div>`;
 }
@@ -241,8 +211,6 @@ function loadingHTML(msg = 'Loading...') {
 function noDataHTML(icon = 'fa-inbox', title = 'No data found', sub = '') {
     return `<div class="no-data"><i class="fas ${icon}"></i><h3>${title}</h3>${sub ? `<p>${sub}</p>` : ''}</div>`;
 }
-
-// ── Transactions (localStorage) ─────────────────
 
 function getTransactions() {
     return JSON.parse(localStorage.getItem('transactions') || '[]');
@@ -253,8 +221,6 @@ function saveTransaction(txn) {
     list.push(txn);
     localStorage.setItem('transactions', JSON.stringify(list));
 }
-
-// ── Form Validation ─────────────────────────────
 
 /**
  * Validates all fields in a form that have the [data-validate] attribute.
@@ -317,7 +283,7 @@ function checkValidationRule(rule, param, field) {
         if (mm < 1 || mm > 12) return 'Invalid expiry month.';
         const now = new Date();
         const expYear = 2000 + yy;
-        const expMonth = mm; // 1-based
+        const expMonth = mm;
         if (expYear < now.getFullYear() || (expYear === now.getFullYear() && expMonth < now.getMonth() + 1))
             return 'Card has expired.';
     }
@@ -340,8 +306,6 @@ function clearFieldError(field) {
     const existing = field.parentNode.querySelector('.field-error');
     if (existing) existing.remove();
 }
-
-// ── Mobile Navigation (hamburger) ──────────────
 
 /**
  * Injects a hamburger toggle button into the navbar and wires up open/close logic.
@@ -373,7 +337,6 @@ function initMobileNav() {
     btn.addEventListener('click', (e) => { e.stopPropagation(); toggleNav(); });
     container.appendChild(btn);
 
-    // Close nav when a link inside it is clicked
     const navMenu = container.querySelector('.nav-menu');
     if (navMenu) {
         navMenu.querySelectorAll('a').forEach(a => {
@@ -381,7 +344,6 @@ function initMobileNav() {
         });
     }
 
-    // Close nav when clicking outside the navbar
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.navbar')) toggleNav(false);
     }, { passive: true });

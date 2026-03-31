@@ -1,25 +1,19 @@
-// auth.js – User authentication functionality
-
 let currentTab = 'login';
 
-// Switch between login and register tabs
 function switchTab(tab) {
     currentTab = tab;
-    
-    // Update tab buttons
+
     document.querySelectorAll('.auth-tab').forEach(btn => {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
-    
-    // Update forms
+
     document.querySelectorAll('.auth-form').forEach(form => {
         form.classList.remove('active');
     });
     document.getElementById(`${tab}-form`).classList.add('active');
 }
 
-// Toggle password visibility
 function togglePassword(inputId) {
     const input = document.getElementById(inputId);
     const button = input.nextElementSibling;
@@ -36,7 +30,6 @@ function togglePassword(inputId) {
     }
 }
 
-// Handle login form submission
 async function handleLogin(event) {
     event.preventDefault();
     
@@ -49,7 +42,6 @@ async function handleLogin(event) {
     const password = document.getElementById('login-password').value;
     const rememberMe = document.getElementById('remember-me').checked;
     
-    // Show loading state
     const submitBtn = form.querySelector('.auth-btn');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
@@ -67,17 +59,15 @@ async function handleLogin(event) {
         const result = await response.json();
         
         if (result.success) {
-            // Save user session AND JWT token
             saveSession('currentUser', result.data);
-            saveToken(result.token); // persist token in localStorage
-            localStorage.setItem('currentUser', JSON.stringify(result.data)); // cross-tab persistence
+            saveToken(result.token);
+            localStorage.setItem('currentUser', JSON.stringify(result.data));
             if (rememberMe) {
                 localStorage.setItem('rememberUser', email);
             }
             
             showToast('Login successful! Redirecting...', 'success');
-            
-            // Redirect to home page after delay
+
             setTimeout(() => {
                 window.location.href = 'home.html';
             }, 1500);
@@ -88,13 +78,11 @@ async function handleLogin(event) {
         console.error('Login error:', error);
         showToast('Network error. Please try again.', 'error');
     } finally {
-        // Restore button state
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
 }
 
-// Handle registration form submission
 async function handleRegister(event) {
     event.preventDefault();
     
@@ -110,7 +98,6 @@ async function handleRegister(event) {
     const confirmPassword = document.getElementById('register-confirm').value;
     const agreeTerms = document.getElementById('agree-terms').checked;
     
-    // Validate password match
     if (password !== confirmPassword) {
         showToast('Passwords do not match', 'error');
         return;
@@ -121,7 +108,6 @@ async function handleRegister(event) {
         return;
     }
     
-    // Show loading state
     const submitBtn = form.querySelector('.auth-btn');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
@@ -140,8 +126,7 @@ async function handleRegister(event) {
         
         if (result.success) {
             showToast('Registration successful! Please login...', 'success');
-            
-            // Switch to login tab and populate email
+
             setTimeout(() => {
                 switchTab('login');
                 document.querySelector('.auth-tab').click();
@@ -155,38 +140,32 @@ async function handleRegister(event) {
         console.error('Registration error:', error);
         showToast('Network error. Please try again.', 'error');
     } finally {
-        // Restore button state
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
 }
 
-// Social login (placeholder for future implementation)
 function socialLogin(provider) {
     if (provider === 'facebook') {
         showToast('Facebook login coming soon!', 'info');
     }
 }
 
-// Initialize Google Sign-In
 function initializeGoogleSignIn() {
     if (typeof google === 'undefined' || !GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') {
         console.warn('Google Sign-In not configured. Please set GOOGLE_CLIENT_ID in config.js');
         return;
     }
 
-    // Initialize Google Sign-In
     google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: handleGoogleCallback,
         auto_select: false
     });
 
-    // Derive a stable button width from the auth card (visible regardless of active tab)
     const authCard = document.querySelector('.auth-card');
     const cardWidth = authCard ? authCard.offsetWidth - 80 : 370;
 
-    // Render Google Sign-In button for login form
     const loginButton = document.getElementById('google-signin-button-login');
     if (loginButton) {
         google.accounts.id.renderButton(
@@ -202,7 +181,6 @@ function initializeGoogleSignIn() {
         );
     }
 
-    // Render Google Sign-In button for register form
     const registerButton = document.getElementById('google-signin-button-register');
     if (registerButton) {
         google.accounts.id.renderButton(
@@ -219,11 +197,9 @@ function initializeGoogleSignIn() {
     }
 }
 
-// Handle Google OAuth callback
 async function handleGoogleCallback(response) {
     const idToken = response.credential;
-    
-    // Show loading toast
+
     showToast('Signing in with Google...', 'info');
     
     try {
@@ -238,14 +214,12 @@ async function handleGoogleCallback(response) {
         const result = await apiResponse.json();
         
         if (result.success) {
-            // Save user session AND JWT token
             saveSession('currentUser', result.data);
             saveToken(result.token);
             localStorage.setItem('currentUser', JSON.stringify(result.data));
             
             showToast('Google sign-in successful! Redirecting...', 'success');
-            
-            // Redirect to home page after delay
+
             setTimeout(() => {
                 window.location.href = 'home.html';
             }, 1500);
@@ -258,17 +232,14 @@ async function handleGoogleCallback(response) {
     }
 }
 
-// Check if user is already logged in
 function checkAuthStatus() {
     const currentUser = getSession('currentUser');
     const token = getToken();
     if (currentUser && token) {
-        // User is logged in, redirect to home
         window.location.href = 'home.html';
         return true;
     }
-    
-    // Check for remembered user
+
     const rememberedEmail = localStorage.getItem('rememberUser');
     if (rememberedEmail) {
         document.getElementById('login-email').value = rememberedEmail;
@@ -278,7 +249,6 @@ function checkAuthStatus() {
     return false;
 }
 
-// Logout function
 function logout() {
     clearToken();
     clearSession('currentUser');
@@ -290,18 +260,13 @@ function logout() {
     setTimeout(() => { window.location.href = 'auth.html'; }, 800);
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if user is already authenticated
     if (!checkAuthStatus()) {
-        // Set up form validation
         setupFormValidation();
-        
-        // Initialize Google Sign-In
+
         if (typeof google !== 'undefined') {
             initializeGoogleSignIn();
         } else {
-            // Wait for Google SDK to load
             window.addEventListener('load', () => {
                 if (typeof google !== 'undefined') {
                     initializeGoogleSignIn();
@@ -311,9 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Enhanced form validation for auth forms
 function setupFormValidation() {
-    // Password confirmation validation
     const confirmPassword = document.getElementById('register-confirm');
     if (confirmPassword) {
         confirmPassword.addEventListener('input', function() {
@@ -326,7 +289,6 @@ function setupFormValidation() {
         });
     }
     
-    // Email format validation
     const emailInputs = document.querySelectorAll('input[type="email"]');
     emailInputs.forEach(input => {
         input.addEventListener('blur', function() {
@@ -340,7 +302,6 @@ function setupFormValidation() {
     });
 }
 
-// Export functions for use in other files
 window.authFunctions = {
     logout,
     checkAuthStatus,
