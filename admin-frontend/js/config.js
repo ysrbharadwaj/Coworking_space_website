@@ -2,7 +2,8 @@
 // Admin – Shared Configuration & Utilities
 // ================================================
 
-const API_URL = 'http://localhost:3001/api';
+const API_HOST = window.location.hostname || 'localhost';
+const API_URL = `${window.location.protocol}//${API_HOST}:3001/api`;
 
 function formatType(type) {
     const m = { hotdesk: 'Hot Desk', cabin: 'Private Cabin', meeting_room: 'Meeting Room', conference: 'Conference Hall' };

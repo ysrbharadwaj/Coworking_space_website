@@ -40,9 +40,15 @@
         <a href="transactions-list.html" data-page="transactions-list">
             <i class="fas fa-calendar-check"></i> Bookings & Transactions
         </a>
+        <a href="qr-scanner.html" data-page="qr-scanner">
+            <i class="fas fa-qrcode"></i> QR Scanner
+        </a>
         <a href="financial-reports.html" data-page="financial-reports">
             <i class="fas fa-chart-bar"></i> Reports
         </a>
+            <a href="waitlist.html" data-page="waitlist">
+                <i class="fas fa-list"></i> Waitlist
+            </a>
         
         <div style="margin-top:auto;padding:1rem;border-top:1px solid var(--border);">
             <button onclick="handleLogout()" style="width:100%;padding:.75rem;background:white;color:var(--danger);border:1px solid var(--danger);cursor:pointer;font-weight:600;transition:all .15s;">

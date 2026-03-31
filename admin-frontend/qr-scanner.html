@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner - WorkSpace Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode" defer></script>
+</head>
+
+<body>
+    <main class="admin-main">
+        <header class="admin-header">
+            <div>
+                <h1><i class="fas fa-qrcode"></i> QR Check-In Scanner</h1>
+                <p class="muted">Scan user entry QR and validate check-in instantly.</p>
+            </div>
+        </header>
+
+        <div class="admin-content" style="display:grid;grid-template-columns:1.1fr .9fr;gap:1.5rem;align-items:start;">
+            <section class="card">
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+                    <h2 style="margin:0;">Camera Scanner</h2>
+                    <div style="display:flex;gap:.5rem;">
+                        <button id="start-scan-btn" class="btn btn-success">
+                            <i class="fas fa-camera"></i> Start
+                        </button>
+                        <button id="stop-scan-btn" class="btn btn-outline" disabled>
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="scanner-status" class="alert alert-info" style="margin-bottom:1rem;">
+                        Click Start to begin scanning.
+                    </div>
+                    <div id="qr-reader" style="width:100%;max-width:520px;margin:0 auto;"></div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <h2 style="margin:0;">Manual Validation</h2>
+                </div>
+                <div class="card-body">
+                    <form id="manual-validate-form">
+                        <label for="manual-qr-value" style="font-weight:600;display:block;margin-bottom:.5rem;">Paste QR Value or Ticket URL</label>
+                        <textarea id="manual-qr-value" rows="4" placeholder="BOOKING-123-1711388812345 or https://.../ticket.html?qr=..."
+                            style="width:100%;padding:.75rem;border:1px solid var(--border);border-radius:6px;resize:vertical;"></textarea>
+                        <div style="margin-top:.75rem;display:flex;gap:.5rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check-circle"></i> Validate
+                            </button>
+                            <button type="button" id="manual-clear-btn" class="btn btn-outline">
+                                <i class="fas fa-eraser"></i> Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="card" style="grid-column:1/-1;">
+                <div class="card-header">
+                    <h2 style="margin:0;">Scan Result</h2>
+                </div>
+                <div class="card-body" id="scan-result">
+                    <div class="muted">No scan yet.</div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/admin-layout.js"></script>
+    <script src="js/qr-scanner.js"></script>
+</body>
+
+</html>

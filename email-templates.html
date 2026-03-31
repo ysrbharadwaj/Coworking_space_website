@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coworking Email Templates</title>
+</head>
+<body style="margin:0; padding:24px; background:#f3f5f8; font-family:Arial, Helvetica, sans-serif; color:#111827;">
+  <h1 style="margin:0 0 8px;">Coworking Platform Email Templates</h1>
+  <p style="margin:0 0 24px; color:#4b5563;">Copy the content inside each template block and paste into your EmailJS template editor.</p>
+  <p style="margin:0 0 24px; color:#4b5563;">Variables used: {{to_name}}, {{to_email}}, {{booking_id}}, {{workspace_name}}, {{hub_name}}, {{start_time}}, {{end_time}}, {{booking_date}}, {{total_price}}, {{transaction_id}}, {{payment_method}}, {{manage_booking_url}}, {{action_url}}, {{support_email}}, {{support_phone}}, {{app_name}}, {{year}}</p>
+
+  <!-- TEMPLATE 1: WELCOME EMAIL -->
+  <template id="welcome-email">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef2ff; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#1d4ed8; color:#ffffff; padding:24px; font-size:22px; font-weight:700;">{{app_name}} - Welcome</td>
+            </tr>
+            <tr>
+              <td style="padding:24px; line-height:1.6; color:#1f2937;">
+                <p style="margin:0 0 14px;">Hi {{to_name}},</p>
+                <p style="margin:0 0 14px;">Welcome to {{app_name}}. Your account has been created successfully.</p>
+                <p style="margin:0 0 18px;">You can now search workspaces, place holds, and confirm bookings in seconds.</p>
+                <table role="presentation" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td style="border-radius:8px; background:#1d4ed8;">
+                      <a href="{{action_url}}" style="display:inline-block; padding:12px 18px; color:#ffffff; text-decoration:none; font-weight:600;">Explore Workspaces</a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:20px 0 0; font-size:13px; color:#6b7280;">Need help? Reach us at {{support_email}} or {{support_phone}}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px; background:#f9fafb; color:#6b7280; font-size:12px;">&copy; {{year}} {{app_name}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </template>
+
+  <!-- TEMPLATE 2: BOOKING CONFIRMED -->
+  <template id="booking-confirmed-email">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#ecfdf5; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#047857; color:#ffffff; padding:24px; font-size:22px; font-weight:700;">Booking Confirmed</td>
+            </tr>
+            <tr>
+              <td style="padding:24px; color:#1f2937; line-height:1.6;">
+                <p style="margin:0 0 12px;">Hi {{to_name}},</p>
+                <p style="margin:0 0 16px;">Your booking is confirmed. Here are your details:</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="border:1px solid #d1fae5; border-radius:8px;">
+                  <tr><td style="color:#6b7280; width:40%;">Booking ID</td><td><strong>{{booking_id}}</strong></td></tr>
+                  <tr><td style="color:#6b7280;">Hub</td><td>{{hub_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Workspace</td><td>{{workspace_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Date</td><td>{{booking_date}}</td></tr>
+                  <tr><td style="color:#6b7280;">Time</td><td>{{start_time}} - {{end_time}}</td></tr>
+                  <tr><td style="color:#6b7280;">Amount Paid</td><td><strong>{{total_price}}</strong></td></tr>
+                  <tr><td style="color:#6b7280;">Transaction ID</td><td>{{transaction_id}}</td></tr>
+                </table>
+                <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:18px;">
+                  <tr>
+                    <td style="border-radius:8px; background:#047857;">
+                      <a href="{{manage_booking_url}}" style="display:inline-block; padding:12px 18px; color:#ffffff; text-decoration:none; font-weight:600;">View Booking</a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:20px 0 0; font-size:13px; color:#6b7280;">Questions? Contact {{support_email}}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px; background:#f9fafb; color:#6b7280; font-size:12px;">&copy; {{year}} {{app_name}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </template>
+
+  <!-- TEMPLATE 3: BOOKING CANCELLED -->
+  <template id="booking-cancelled-email">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fef2f2; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#b91c1c; color:#ffffff; padding:24px; font-size:22px; font-weight:700;">Booking Cancelled</td>
+            </tr>
+            <tr>
+              <td style="padding:24px; color:#1f2937; line-height:1.6;">
+                <p style="margin:0 0 12px;">Hi {{to_name}},</p>
+                <p style="margin:0 0 16px;">Your booking has been cancelled successfully.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="border:1px solid #fecaca; border-radius:8px;">
+                  <tr><td style="color:#6b7280; width:40%;">Booking ID</td><td><strong>{{booking_id}}</strong></td></tr>
+                  <tr><td style="color:#6b7280;">Hub</td><td>{{hub_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Workspace</td><td>{{workspace_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Date</td><td>{{booking_date}}</td></tr>
+                  <tr><td style="color:#6b7280;">Time</td><td>{{start_time}} - {{end_time}}</td></tr>
+                </table>
+                <p style="margin:16px 0 0;">If this was not initiated by you, please contact support immediately at {{support_email}}.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px; background:#f9fafb; color:#6b7280; font-size:12px;">&copy; {{year}} {{app_name}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </template>
+
+  <!-- TEMPLATE 4: PAYMENT SUCCESS -->
+  <template id="payment-success-email">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eff6ff; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#1e40af; color:#ffffff; padding:24px; font-size:22px; font-weight:700;">Payment Received</td>
+            </tr>
+            <tr>
+              <td style="padding:24px; color:#1f2937; line-height:1.6;">
+                <p style="margin:0 0 12px;">Hi {{to_name}},</p>
+                <p style="margin:0 0 16px;">We received your payment successfully.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="border:1px solid #dbeafe; border-radius:8px;">
+                  <tr><td style="color:#6b7280; width:40%;">Transaction ID</td><td><strong>{{transaction_id}}</strong></td></tr>
+                  <tr><td style="color:#6b7280;">Amount</td><td><strong>{{total_price}}</strong></td></tr>
+                  <tr><td style="color:#6b7280;">Payment Method</td><td>{{payment_method}}</td></tr>
+                  <tr><td style="color:#6b7280;">Booking ID</td><td>{{booking_id}}</td></tr>
+                </table>
+                <p style="margin:16px 0 0;">A booking confirmation email should follow shortly.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px; background:#f9fafb; color:#6b7280; font-size:12px;">&copy; {{year}} {{app_name}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </template>
+
+  <!-- TEMPLATE 5: PAYMENT FAILED -->
+  <template id="payment-failed-email">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fff7ed; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#c2410c; color:#ffffff; padding:24px; font-size:22px; font-weight:700;">Payment Failed</td>
+            </tr>
+            <tr>
+              <td style="padding:24px; color:#1f2937; line-height:1.6;">
+                <p style="margin:0 0 12px;">Hi {{to_name}},</p>
+                <p style="margin:0 0 16px;">Your recent payment attempt for booking {{booking_id}} did not go through.</p>
+                <p style="margin:0 0 16px;">Please try again using a different payment method before your slot hold expires.</p>
+                <table role="presentation" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td style="border-radius:8px; background:#c2410c;">
+                      <a href="{{action_url}}" style="display:inline-block; padding:12px 18px; color:#ffffff; text-decoration:none; font-weight:600;">Retry Payment</a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:16px 0 0; font-size:13px; color:#6b7280;">If you keep facing issues, contact {{support_email}}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px; background:#f9fafb; color:#6b7280; font-size:12px;">&copy; {{year}} {{app_name}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </template>
+
+  <!-- TEMPLATE 6: WAITLIST JOINED -->
+  <template id="waitlist-joined-email">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f3ff; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#6d28d9; color:#ffffff; padding:24px; font-size:22px; font-weight:700;">Added to Waitlist</td>
+            </tr>
+            <tr>
+              <td style="padding:24px; color:#1f2937; line-height:1.6;">
+                <p style="margin:0 0 12px;">Hi {{to_name}},</p>
+                <p style="margin:0 0 16px;">You are now on the waitlist for this slot.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="border:1px solid #e9d5ff; border-radius:8px;">
+                  <tr><td style="color:#6b7280; width:40%;">Hub</td><td>{{hub_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Workspace</td><td>{{workspace_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Date</td><td>{{booking_date}}</td></tr>
+                  <tr><td style="color:#6b7280;">Time</td><td>{{start_time}} - {{end_time}}</td></tr>
+                </table>
+                <p style="margin:16px 0 0;">We will notify you immediately if this slot opens up.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px; background:#f9fafb; color:#6b7280; font-size:12px;">&copy; {{year}} {{app_name}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </template>
+
+  <!-- TEMPLATE 7: WAITLIST OFFERED -->
+  <template id="waitlist-offered-email">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#ecfeff; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#0f766e; color:#ffffff; padding:24px; font-size:22px; font-weight:700;">Slot Available - Act Now</td>
+            </tr>
+            <tr>
+              <td style="padding:24px; color:#1f2937; line-height:1.6;">
+                <p style="margin:0 0 12px;">Hi {{to_name}},</p>
+                <p style="margin:0 0 16px;">Good news. A waitlisted slot is now available for you.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="border:1px solid #ccfbf1; border-radius:8px;">
+                  <tr><td style="color:#6b7280; width:40%;">Hub</td><td>{{hub_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Workspace</td><td>{{workspace_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Date</td><td>{{booking_date}}</td></tr>
+                  <tr><td style="color:#6b7280;">Time</td><td>{{start_time}} - {{end_time}}</td></tr>
+                  <tr><td style="color:#6b7280;">Offer Expires</td><td><strong>{{action_deadline}}</strong></td></tr>
+                </table>
+                <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:18px;">
+                  <tr>
+                    <td style="border-radius:8px; background:#0f766e;">
+                      <a href="{{action_url}}" style="display:inline-block; padding:12px 18px; color:#ffffff; text-decoration:none; font-weight:600;">Claim This Slot</a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:16px 0 0; font-size:13px; color:#6b7280;">If not claimed in time, the slot will be offered to the next person.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px; background:#f9fafb; color:#6b7280; font-size:12px;">&copy; {{year}} {{app_name}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </template>
+
+  <!-- TEMPLATE 8: WAITLIST OFFER EXPIRED -->
+  <template id="waitlist-expired-email">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8fafc; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#334155; color:#ffffff; padding:24px; font-size:22px; font-weight:700;">Waitlist Offer Expired</td>
+            </tr>
+            <tr>
+              <td style="padding:24px; color:#1f2937; line-height:1.6;">
+                <p style="margin:0 0 12px;">Hi {{to_name}},</p>
+                <p style="margin:0 0 16px;">Your temporary offer window has expired for this slot.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="border:1px solid #e2e8f0; border-radius:8px;">
+                  <tr><td style="color:#6b7280; width:40%;">Hub</td><td>{{hub_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Workspace</td><td>{{workspace_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Date</td><td>{{booking_date}}</td></tr>
+                  <tr><td style="color:#6b7280;">Time</td><td>{{start_time}} - {{end_time}}</td></tr>
+                </table>
+                <p style="margin:16px 0 0;">You can still book other available slots now.</p>
+                <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:14px;">
+                  <tr>
+                    <td style="border-radius:8px; background:#334155;">
+                      <a href="{{action_url}}" style="display:inline-block; padding:12px 18px; color:#ffffff; text-decoration:none; font-weight:600;">Find Another Slot</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px; background:#f9fafb; color:#6b7280; font-size:12px;">&copy; {{year}} {{app_name}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </template>
+
+  <!-- TEMPLATE 9: CHECK-IN REMINDER -->
+  <template id="checkin-reminder-email">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fffbeb; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="620" cellspacing="0" cellpadding="0" style="max-width:620px; background:#ffffff; border-radius:12px; overflow:hidden;">
+            <tr>
+              <td style="background:#a16207; color:#ffffff; padding:24px; font-size:22px; font-weight:700;">Upcoming Booking Reminder</td>
+            </tr>
+            <tr>
+              <td style="padding:24px; color:#1f2937; line-height:1.6;">
+                <p style="margin:0 0 12px;">Hi {{to_name}},</p>
+                <p style="margin:0 0 16px;">This is a reminder for your upcoming booking.</p>
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="8" style="border:1px solid #fde68a; border-radius:8px;">
+                  <tr><td style="color:#6b7280; width:40%;">Booking ID</td><td><strong>{{booking_id}}</strong></td></tr>
+                  <tr><td style="color:#6b7280;">Hub</td><td>{{hub_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Workspace</td><td>{{workspace_name}}</td></tr>
+                  <tr><td style="color:#6b7280;">Date</td><td>{{booking_date}}</td></tr>
+                  <tr><td style="color:#6b7280;">Time</td><td>{{start_time}} - {{end_time}}</td></tr>
+                </table>
+                <p style="margin:16px 0 0;">Please arrive a few minutes early for smooth check-in.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 24px; background:#f9fafb; color:#6b7280; font-size:12px;">&copy; {{year}} {{app_name}}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </template>
+</body>
+</html>

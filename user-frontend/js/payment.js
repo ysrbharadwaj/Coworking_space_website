@@ -106,15 +106,45 @@ async function processPayment(method) {
 
         const booking = bookResult.data;
 
-        // 2. Generate QR code
-        const qrRes    = await fetch(`${API_URL}/qr/generate/${booking.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
-        const qrResult = await qrRes.json();
+        // 2. Generate/fetch QR code (best-effort; booking is already confirmed)
+        let qrImage = null;
+        let qrValue = null;
+
+        try {
+            const qrRes = await fetch(`${API_URL}/qr/generate/${booking.id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const qrResult = await qrRes.json();
+
+            if (qrRes.ok && qrResult.success) {
+                qrImage = qrResult.data?.qr_image || null;
+                qrValue = qrResult.data?.qr_code?.qr_value || null;
+            }
+        } catch (qrErr) {
+            console.warn('QR generation failed, trying QR fetch fallback:', qrErr);
+        }
+
+        if (!qrImage) {
+            try {
+                const qrFetchRes = await fetch(`${API_URL}/qr/booking/${booking.id}`);
+                const qrFetchResult = await qrFetchRes.json();
+                if (qrFetchRes.ok && qrFetchResult.success) {
+                    qrImage = qrFetchResult.data?.qr_image || null;
+                    qrValue = qrFetchResult.data?.qr_code?.qr_value || null;
+                }
+            } catch (qrFetchErr) {
+                console.warn('QR fallback fetch failed:', qrFetchErr);
+            }
+        }
 
         // 3. Persist confirmation data and navigate (server is source of truth for user identity)
         const currentUser = getCurrentUser();
         saveSession('confirmedBooking', {
             booking,
-            qr_image: qrResult.data?.qr_image || null,
+            booking_id: booking.id,
+            qr_image: qrImage,
+            qr_value: qrValue,
             workspace_name: bookingData.workspace_name,
             hub_name:   bookingData.hub_name,
             hub_city:   bookingData.hub_city,

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waitlist Control - WorkSpace Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <main class="admin-main">
+        <header class="admin-header">
+            <div>
+                <h1><i class="fas fa-list-ul"></i> Waitlist Control</h1>
+                <p class="muted">Monitor blocked slots, reprioritize guests, and trigger manual offers.</p>
+            </div>
+            <span id="waitlist-updated" style="color:var(--text-light);font-size:.9rem;"></span>
+        </header>
+
+        <div class="admin-content">
+            <div class="card" style="margin-bottom:1.5rem;">
+                <div class="card-body" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;">
+                    <div class="toolbar-search" style="flex:1 1 240px;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="waitlist-search" placeholder="Search by workspace, hub, or guest...">
+                    </div>
+                    <div class="toolbar-filter" style="min-width:180px;">
+                        <label for="waitlist-status" style="font-size:.8rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.1em;">Status</label>
+                        <select id="waitlist-status">
+                            <option value="">All</option>
+                            <option value="pending">Pending</option>
+                            <option value="offered">Offered</option>
+                            <option value="claimed">Claimed</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                    <label style="display:flex;align-items:center;gap:.5rem;font-weight:600;">
+                        <input type="checkbox" id="waitlist-active-only">
+                        Active only
+                    </label>
+                    <button class="btn" id="waitlist-refresh-btn" style="margin-left:auto;">
+                        <i class="fas fa-rotate"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:60px;">#</th>
+                                    <th>Workspace / Slot</th>
+                                    <th>User</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Offer Window</th>
+                                    <th style="width:180px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="waitlist-table">
+                                <tr>
+                                    <td colspan="7" style="text-align:center;">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading waitlist entries...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/admin-layout.js"></script>
+    <script src="js/waitlist.js"></script>
+</body>
+
+</html>

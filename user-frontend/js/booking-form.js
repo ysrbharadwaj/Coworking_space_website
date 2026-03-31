@@ -3,6 +3,9 @@
 let currentWorkspace = null;
 let selectedResources = [];
 let currentAvailability = null;
+const WAITLIST_ACTIVE_STATUSES = ['pending', 'offered'];
+let activeWaitlistEntry = null;
+let waitlistPollTimer = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!requireAuth()) return;
@@ -14,6 +17,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadResources(wsId);
 
     document.getElementById('booking-form').addEventListener('submit', handleSubmit);
+
+    const joinBtn  = document.getElementById('join-waitlist-btn');
+    const leaveBtn = document.getElementById('leave-waitlist-btn');
+    if (joinBtn)  joinBtn.addEventListener('click', joinWaitlist);
+    if (leaveBtn) leaveBtn.addEventListener('click', leaveWaitlist);
 
     // Wire up real-time pricing updates
     ['start-time', 'end-time', 'booking-type'].forEach(id => {
@@ -168,10 +176,14 @@ async function checkAvailability() {
             renderAvailability('<i class="fas fa-ban"></i><span><strong>Unavailable:</strong> This slot is already booked.</span>', 'error');
         }
 
+        await syncWaitlistEntryForCurrentSlot();
+        updateWaitlistPanel(result.data);
+
         return result.data;
     } catch (e) {
         currentAvailability = null;
         renderAvailability(`<i class="fas fa-wifi"></i><span><strong>Could not verify live availability:</strong> ${e.message}</span>`, 'warning');
+        updateWaitlistPanel(null);
         return null;
     }
 }
@@ -328,6 +340,184 @@ async function updatePricing() {
             <div class="price-row"><span>Resources:</span><span id="resources-price">₹${res}</span></div>
             <div class="price-row total"><span>Total:</span><span id="total-price">₹${base + res}</span></div>`;
         await checkAvailability();
+    }
+}
+
+// ── Waitlist Helpers ─────────────────────────
+
+function getCurrentSlotKey() {
+    if (!currentWorkspace) return null;
+    const start = document.getElementById('start-time').value;
+    const end   = document.getElementById('end-time').value;
+    if (!start || !end) return null;
+    try {
+        return `${currentWorkspace.id}:${new Date(start).toISOString()}:${new Date(end).toISOString()}`;
+    } catch (e) {
+        return null;
+    }
+}
+
+function updateWaitlistPanel(availabilityData) {
+    const panel    = document.getElementById('waitlist-panel');
+    const message  = document.getElementById('waitlist-message');
+    const joinBtn  = document.getElementById('join-waitlist-btn');
+    const leaveBtn = document.getElementById('leave-waitlist-btn');
+    if (!panel || !message || !joinBtn || !leaveBtn) return;
+
+    const slotKey = getCurrentSlotKey();
+    const slotBlocked = availabilityData && availabilityData.available === false;
+
+    if (!activeWaitlistEntry && !slotBlocked) {
+        panel.style.display = 'none';
+        return;
+    }
+
+    panel.style.display = 'block';
+
+    if (activeWaitlistEntry) {
+        joinBtn.style.display  = 'none';
+        leaveBtn.style.display = 'inline-flex';
+
+        if (activeWaitlistEntry.status === 'pending') {
+            const position = activeWaitlistEntry.queue_position || '...';
+            message.className = 'alert alert-warning';
+            message.innerHTML = `<i class="fas fa-user-clock"></i><span><strong>On waitlist:</strong> You are #${position} for this slot. We will alert you as soon as it frees up.</span>`;
+        } else if (activeWaitlistEntry.status === 'offered') {
+            const deadline = activeWaitlistEntry.offer_expires_at
+                ? new Date(activeWaitlistEntry.offer_expires_at).toLocaleTimeString()
+                : 'soon';
+            message.className = 'alert alert-success';
+            message.innerHTML = `<i class="fas fa-bell"></i><span><strong>Your turn!</strong> You have priority access until ${deadline}. Proceed to payment to confirm.</span>`;
+        } else {
+            panel.style.display = 'none';
+        }
+        return;
+    }
+
+    if (slotBlocked && slotKey) {
+        joinBtn.style.display  = 'inline-flex';
+        joinBtn.disabled       = false;
+        leaveBtn.style.display = 'none';
+        message.className      = 'alert alert-warning';
+        message.innerHTML      = '<i class="fas fa-user-clock"></i><span><strong>Slot full:</strong> Join the waitlist to be auto-allocated when it frees up.</span>';
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+function setActiveWaitlistEntry(entry) {
+    const sanitized = entry && WAITLIST_ACTIVE_STATUSES.includes(entry.status) ? entry : null;
+    activeWaitlistEntry = sanitized;
+    if (activeWaitlistEntry) {
+        startWaitlistPolling();
+    } else {
+        stopWaitlistPolling();
+    }
+    updateWaitlistPanel(currentAvailability);
+}
+
+function startWaitlistPolling() {
+    if (waitlistPollTimer) return;
+    waitlistPollTimer = setInterval(refreshActiveWaitlistEntry, 15000);
+}
+
+function stopWaitlistPolling() {
+    if (waitlistPollTimer) {
+        clearInterval(waitlistPollTimer);
+        waitlistPollTimer = null;
+    }
+}
+
+async function refreshActiveWaitlistEntry() {
+    if (!activeWaitlistEntry) return;
+    try {
+        const entries = await fetchMyWaitlistEntries();
+        const updated = entries.find(e => e.slot_key === activeWaitlistEntry.slot_key && WAITLIST_ACTIVE_STATUSES.includes(e.status));
+        setActiveWaitlistEntry(updated || null);
+    } catch (err) {
+        console.warn('Failed to refresh waitlist entry', err);
+    }
+}
+
+async function fetchMyWaitlistEntries() {
+    const res = await fetch(`${API_URL}/bookings/waitlist/my`, {
+        headers: getAuthHeaders()
+    });
+    const result = await res.json();
+    if (!res.ok || !result.success) throw new Error(result.error || 'Could not load waitlist entries');
+    return result.data || [];
+}
+
+async function syncWaitlistEntryForCurrentSlot(force = false) {
+    const slotKey = getCurrentSlotKey();
+    if (!slotKey) {
+        setActiveWaitlistEntry(null);
+        return;
+    }
+
+    if (!force && activeWaitlistEntry && activeWaitlistEntry.slot_key === slotKey) return;
+
+    try {
+        const entries = await fetchMyWaitlistEntries();
+        const match = entries.find(e => e.slot_key === slotKey && WAITLIST_ACTIVE_STATUSES.includes(e.status));
+        setActiveWaitlistEntry(match || null);
+    } catch (err) {
+        console.warn('Could not sync waitlist entry', err);
+    }
+}
+
+async function joinWaitlist() {
+    if (!currentWorkspace) return;
+    const start = document.getElementById('start-time').value;
+    const end   = document.getElementById('end-time').value;
+    if (!start || !end) {
+        showToast('Select a start and end time before joining the waitlist.', 'error');
+        return;
+    }
+
+    const joinBtn = document.getElementById('join-waitlist-btn');
+    if (joinBtn) joinBtn.disabled = true;
+
+    try {
+        const res = await fetch(`${API_URL}/bookings/waitlist`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                workspace_id: currentWorkspace.id,
+                start_time: start,
+                end_time: end
+            })
+        });
+        const result = await res.json();
+        if (!res.ok || !result.success) throw new Error(result.error || 'Could not join waitlist');
+        setActiveWaitlistEntry(result.data);
+        showToast('Added to waitlist for this slot.', 'success');
+    } catch (err) {
+        showToast(err.message, 'error');
+    } finally {
+        if (joinBtn) joinBtn.disabled = false;
+    }
+}
+
+async function leaveWaitlist() {
+    if (!activeWaitlistEntry) return;
+    const leaveBtn = document.getElementById('leave-waitlist-btn');
+    if (leaveBtn) leaveBtn.disabled = true;
+
+    try {
+        const res = await fetch(`${API_URL}/bookings/waitlist/${activeWaitlistEntry.id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        const result = await res.json();
+        if (!res.ok || !result.success) throw new Error(result.error || 'Could not leave waitlist');
+        showToast('Removed from waitlist.', 'success');
+        setActiveWaitlistEntry(null);
+        await syncWaitlistEntryForCurrentSlot(true);
+    } catch (err) {
+        showToast(err.message, 'error');
+    } finally {
+        if (leaveBtn) leaveBtn.disabled = false;
     }
 }
 
