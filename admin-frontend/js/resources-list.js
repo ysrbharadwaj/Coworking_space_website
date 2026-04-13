@@ -75,8 +75,10 @@ function renderResources(resources) {
             <td>${r.quantity !== undefined ? r.quantity : '—'}</td>
             <td>${r.description || '—'}</td>
             <td>
-                <a href="resource-form.html?resource_id=${r.id}" class="btn btn-sm btn-outline"><i class="fas fa-edit"></i></a>
-                <button class="btn btn-sm btn-danger" onclick="deleteResource(${r.id})"><i class="fas fa-trash"></i></button>
+                <div class="table-actions hub-actions" style="display:flex;align-items:center;gap:.45rem;flex-wrap:nowrap;white-space:nowrap;">
+                    <a href="resource-form.html?resource_id=${r.id}" class="btn btn-sm btn-outline"><i class="fas fa-edit"></i></a>
+                    <button class="btn btn-sm btn-danger" onclick="deleteResource(${r.id})"><i class="fas fa-trash"></i></button>
+                </div>
             </td>
         </tr>
     `).join('');

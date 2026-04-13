@@ -124,9 +124,11 @@ function renderTransactions(txns) {
             <td><span class="badge ${statusBadgeClass}">${t.status || '—'}</span></td>
             <td>${formatDateTime(t.date || t.created_at)}</td>
             <td>
-                <a href="booking-details-admin.html?booking_id=${t.id}" class="btn btn-sm btn-outline">
-                    <i class="fas fa-eye"></i> View
-                </a>
+                <div class="table-actions hub-actions" style="display:flex;align-items:center;gap:.45rem;flex-wrap:nowrap;white-space:nowrap;">
+                    <a href="booking-details-admin.html?booking_id=${t.id}" class="btn btn-sm btn-outline">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                </div>
             </td>
         </tr>
         `;

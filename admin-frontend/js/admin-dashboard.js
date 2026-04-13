@@ -1,6 +1,8 @@
 /* admin-frontend/js/admin-dashboard.js */
 let bookingsChart = null;
 let statusChart = null;
+let dashboardLoadSeq = 0;
+let dashboardLoadInProgress = false;
 
 document.addEventListener('DOMContentLoaded', loadDashboard);
 
@@ -15,6 +17,11 @@ window.addEventListener('pageshow', (event) => {
 });
 
 async function loadDashboard() {
+    if (dashboardLoadInProgress) return;
+
+    dashboardLoadInProgress = true;
+    const loadSeq = ++dashboardLoadSeq;
+
     try {
         const [hubs, workspaces, bookings, users] = await Promise.all([
             fetch(`${API_URL}/hubs`).then(r => r.json()).then(d => d.data || d),
@@ -22,6 +29,8 @@ async function loadDashboard() {
             fetch(`${API_URL}/bookings`).then(r => r.json()).then(d => d.data || d),
             fetch(`${API_URL}/users`, { headers: getAdminHeaders() }).then(r => r.json()).then(d => d.data || d).catch(() => [])
         ]);
+
+        if (loadSeq !== dashboardLoadSeq) return;
 
         // Calculate revenue: sum total_price from all paid bookings
         const paidStatuses = new Set(['confirmed', 'completed', 'checked_in']);
@@ -42,23 +51,23 @@ async function loadDashboard() {
         const userCount = Array.isArray(users) ? users.length : 0;
 
         document.getElementById('stats-row').innerHTML = `
-            <div class="stat-card">
+            <div class="stat-card" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-rupee-sign"></i>
                 <div><div class="value">${formatCurrency(revenue)}</div><div class="label">Total Revenue</div></div>
             </div>
-            <div class="stat-card green">
+            <div class="stat-card green" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-calendar-check"></i>
                 <div><div class="value">${activeBookings}</div><div class="label">Active Bookings</div></div>
             </div>
-            <div class="stat-card yellow">
+            <div class="stat-card yellow" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-building"></i>
                 <div><div class="value">${Array.isArray(hubs) ? hubs.length : 0}</div><div class="label">Hubs</div></div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-door-open"></i>
                 <div><div class="value">${Array.isArray(workspaces) ? workspaces.length : 0}</div><div class="label">Workspaces</div></div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-users"></i>
                 <div><div class="value">${userCount}</div><div class="label">Total Users</div></div>
             </div>
@@ -72,6 +81,10 @@ async function loadDashboard() {
         renderStatusDistributionChart(Array.isArray(bookings) ? bookings : []);
     } catch (err) {
         console.error('Dashboard load error', err);
+    } finally {
+        if (loadSeq === dashboardLoadSeq) {
+            dashboardLoadInProgress = false;
+        }
     }
 }
 
@@ -103,19 +116,30 @@ function renderRecentBookings(bookings) {
 
 function renderHubOverview(hubs, workspaces) {
     const el = document.getElementById('hub-overview');
-    if (!hubs.length) { el.innerHTML = '<p>No hubs found.</p>'; return; }
-    el.innerHTML = hubs.map(h => {
+    if (!el) return;
+
+    el.classList.remove('loading');
+
+    if (!hubs.length) {
+        el.innerHTML = '<p class="hub-overview-empty">No hubs found.</p>';
+        return;
+    }
+
+    const previewHubs = hubs.slice(0, 12);
+    const remainingCount = Math.max(hubs.length - previewHubs.length, 0);
+
+    el.innerHTML = `<div class="hub-overview-list">${previewHubs.map(h => {
         const count = workspaces.filter(w => w.hub_id === h.id).length;
         return `
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid var(--border);">
-                <div>
+            <div class="hub-overview-item">
+                <div class="hub-overview-meta">
                     <strong>${h.name}</strong>
-                    <div style="font-size:.82rem;color:var(--text-light);">${h.city || ''}, ${h.state || ''}</div>
+                    <div class="hub-overview-location">${h.city || ''}${h.city && h.state ? ', ' : ''}${h.state || ''}</div>
                 </div>
-                <span class="badge badge-info">${count} workspace${count !== 1 ? 's' : ''}</span>
+                <span class="badge badge-info hub-overview-badge">${count} workspace${count !== 1 ? 's' : ''}</span>
             </div>
         `;
-    }).join('');
+    }).join('')}${remainingCount > 0 ? `<div class="hub-overview-more">And ${remainingCount} more hubs</div>` : ''}</div>`;
 }
 
 function statusBadge(status) {
@@ -126,11 +150,6 @@ function statusBadge(status) {
 function renderBookingsTrendChart(bookings) {
     const ctx = document.getElementById('bookings-chart');
     if (!ctx) return;
-
-    // Destroy existing chart instance
-    if (bookingsChart) {
-        bookingsChart.destroy();
-    }
 
     // Get last 7 days
     const days = [];
@@ -153,7 +172,7 @@ function renderBookingsTrendChart(bookings) {
         counts.push(count);
     }
 
-    bookingsChart = new Chart(ctx, {
+    const chartConfig = {
         type: 'line',
         data: {
             labels: days,
@@ -169,6 +188,7 @@ function renderBookingsTrendChart(bookings) {
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            animation: false,
             plugins: {
                 legend: { display: false }
             },
@@ -179,17 +199,21 @@ function renderBookingsTrendChart(bookings) {
                 }
             }
         }
-    });
+    };
+
+    if (bookingsChart) {
+        bookingsChart.data.labels = chartConfig.data.labels;
+        bookingsChart.data.datasets[0].data = chartConfig.data.datasets[0].data;
+        bookingsChart.update('none');
+        return;
+    }
+
+    bookingsChart = new Chart(ctx, chartConfig);
 }
 
 function renderStatusDistributionChart(bookings) {
     const ctx = document.getElementById('status-chart');
     if (!ctx) return;
-
-    // Destroy existing chart instance
-    if (statusChart) {
-        statusChart.destroy();
-    }
 
     const statusCounts = {
         confirmed: bookings.filter(b => b.status === 'confirmed').length,
@@ -219,7 +243,7 @@ function renderStatusDistributionChart(bookings) {
         }
     }
 
-    statusChart = new Chart(ctx, {
+    const chartConfig = {
         type: 'doughnut',
         data: {
             labels: labels,
@@ -231,11 +255,22 @@ function renderStatusDistributionChart(bookings) {
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            animation: false,
             plugins: {
                 legend: {
                     position: 'bottom'
                 }
             }
         }
-    });
+    };
+
+    if (statusChart) {
+        statusChart.data.labels = chartConfig.data.labels;
+        statusChart.data.datasets[0].data = chartConfig.data.datasets[0].data;
+        statusChart.data.datasets[0].backgroundColor = chartConfig.data.datasets[0].backgroundColor;
+        statusChart.update('none');
+        return;
+    }
+
+    statusChart = new Chart(ctx, chartConfig);
 }

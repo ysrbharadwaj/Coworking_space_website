@@ -62,11 +62,13 @@ function renderBookings(bookings) {
             <td>${formatDateTime(b.end_time)}</td>
             <td><strong>${formatDateTime(b.created_at)}</strong></td>
             <td><span class="badge ${statusBadge(b.status)}">${b.status}</span></td>
-            <td style="display:flex;gap:.5rem;">
-                <a href="booking-details-admin.html?booking_id=${b.id}" class="btn btn-sm btn-outline">
-                    <i class="fas fa-eye"></i> View
-                </a>
-                ${getQuickActions(b)}
+            <td>
+                <div class="table-actions hub-actions" style="display:flex;align-items:center;gap:.45rem;flex-wrap:nowrap;white-space:nowrap;">
+                    <a href="booking-details-admin.html?booking_id=${b.id}" class="btn btn-sm btn-outline">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                    ${getQuickActions(b)}
+                </div>
             </td>
         </tr>
     `).join('');
