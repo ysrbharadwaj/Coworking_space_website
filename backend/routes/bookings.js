@@ -5,6 +5,7 @@ const { supabase } = require('../config/supabase');
 const { calculateDynamicPrice } = require('../utils/pricing');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const { validate, rules } = require('../middleware/validate');
+const { sendBookingConfirmationEmail } = require('../services/bookingEmailEvents');
 
 const ACTIVE_BOOKING_STATUSES = ['confirmed', 'checked_in'];
 const DEFAULT_HOLD_TTL_SECONDS = 10 * 60;
@@ -15,9 +16,14 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@workspace.com';
 function isMissingPaymentStatusColumnError(error) {
   const message = String(error?.message || '').toLowerCase();
   const details = String(error?.details || '').toLowerCase();
+  const hint = String(error?.hint || '').toLowerCase();
+  const schemaCacheVariant = (message.includes('schema cache') || details.includes('schema cache') || hint.includes('schema cache'))
+    && (message.includes('payment_status') || details.includes('payment_status') || hint.includes('payment_status'));
+
   return error?.code === '42703'
     || (message.includes('payment_status') && message.includes('does not exist'))
-    || (details.includes('payment_status') && details.includes('does not exist'));
+    || (details.includes('payment_status') && details.includes('does not exist'))
+    || schemaCacheVariant;
 }
 
 function buildSlotKey(workspaceId, startTime, endTime) {
@@ -1107,6 +1113,12 @@ router.post('/', authenticateToken, async (req, res) => {
     console.log('📤 RESPONSE TO FRONTEND:');
     console.log(JSON.stringify({ success: true, data: booking }, null, 2));
     console.log('===================================\n');
+
+    // Do not block API success on outbound email failures.
+    setImmediate(() => {
+      sendBookingConfirmationEmail(booking.id)
+        .catch((mailErr) => console.error('Booking confirmation email failed:', mailErr.message));
+    });
 
     res.json({ success: true, data: booking });
   } catch (error) {

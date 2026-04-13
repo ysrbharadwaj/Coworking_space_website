@@ -899,3 +899,26 @@ Ref: qr_codes.booking_id > bookings.id
 9) Booking is confirmed, QR code generated
 
 10) User checks in using QR code
+
+## EmailJS Event Emails
+
+Add these variables to `.env` to enable backend-triggered emails:
+
+- `EMAILJS_SERVICE_ID`
+- `EMAILJS_PUBLIC_KEY`
+- `EMAILJS_PRIVATE_KEY` (optional but recommended for backend calls)
+- `EMAILJS_TEMPLATE_BOOKING_CONFIRMATION`
+- `EMAILJS_TEMPLATE_DEADLINE_REMINDER`
+- `EMAILJS_TEMPLATE_THANK_YOU`
+- `BOOKING_DEADLINE_REMINDER_MINUTES` (optional, default `30`)
+- `BOOKING_EMAIL_JOB_INTERVAL_MS` (optional, default `300000`)
+
+Configured events:
+
+1. Booking confirmation (after successful booking/payment): includes booking QR.
+2. Deadline reminder: sent before booking end time.
+3. Completion thank-you: sent after booking status becomes `completed`.
+
+Run migration before production use:
+
+- `database/migration-email-events.sql`

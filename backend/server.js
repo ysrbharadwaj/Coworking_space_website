@@ -19,6 +19,7 @@ const ratingsRouter = require('./routes/ratings');
 const usersRouter = require('./routes/users');
 const transactionsRouter = require('./routes/transactions');
 const authRouter = require('./routes/auth');
+const { startBookingEmailJobs } = require('./services/bookingEmailEvents');
 
 // Routes
 app.use('/api/hubs', hubsRouter);
@@ -39,4 +40,5 @@ app.get('/health', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  startBookingEmailJobs();
 });
