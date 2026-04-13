@@ -231,6 +231,13 @@ p, label, button, input, td, th { font-family: Inter, system-ui, -apple-system, 
     color: var(--warning);
 }
 
+.dashboard-stats-row .stat-card {
+    border: 1px solid var(--accent);
+    border-radius: 0;
+    border-top-width: 3px;
+    box-shadow: 0 6px 18px rgba(198, 169, 105, .08);
+}
+
 .stat-card .value {
     font-size: 2rem;
     font-weight: 800;
@@ -283,6 +290,13 @@ tbody tr:last-child td {
 .table-actions {
     display: flex;
     gap: .5rem;
+}
+
+.hub-actions {
+    gap: .45rem;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 /* ── Badges / Status ──────────────────────────── */

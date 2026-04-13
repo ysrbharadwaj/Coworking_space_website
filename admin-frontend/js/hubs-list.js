@@ -69,8 +69,10 @@ function renderHubs(hubs) {
             <td>${h.country || '—'}</td>
             <td>${h.address || '—'}</td>
             <td>
-                <a href="hub-form.html?hub_id=${h.id}" class="btn btn-sm btn-outline"><i class="fas fa-edit"></i> Edit</a>
-                <button class="btn btn-sm btn-danger" onclick="deleteHub(${h.id})"><i class="fas fa-trash"></i></button>
+                <div class="table-actions hub-actions" style="display:flex;align-items:center;gap:.45rem;flex-wrap:nowrap;white-space:nowrap;">
+                    <a href="hub-form.html?hub_id=${h.id}" class="btn btn-sm btn-outline"><i class="fas fa-edit"></i> Edit</a>
+                    <button class="btn btn-sm btn-danger" onclick="deleteHub(${h.id})"><i class="fas fa-trash"></i></button>
+                </div>
             </td>
         </tr>
     `).join('');

@@ -42,23 +42,23 @@ async function loadDashboard() {
         const userCount = Array.isArray(users) ? users.length : 0;
 
         document.getElementById('stats-row').innerHTML = `
-            <div class="stat-card">
+            <div class="stat-card" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-rupee-sign"></i>
                 <div><div class="value">${formatCurrency(revenue)}</div><div class="label">Total Revenue</div></div>
             </div>
-            <div class="stat-card green">
+            <div class="stat-card green" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-calendar-check"></i>
                 <div><div class="value">${activeBookings}</div><div class="label">Active Bookings</div></div>
             </div>
-            <div class="stat-card yellow">
+            <div class="stat-card yellow" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-building"></i>
                 <div><div class="value">${Array.isArray(hubs) ? hubs.length : 0}</div><div class="label">Hubs</div></div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-door-open"></i>
                 <div><div class="value">${Array.isArray(workspaces) ? workspaces.length : 0}</div><div class="label">Workspaces</div></div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" style="border:1px solid var(--accent);border-radius:0;box-shadow:0 6px 18px rgba(198, 169, 105, .08);">
                 <i class="fas fa-users"></i>
                 <div><div class="value">${userCount}</div><div class="label">Total Users</div></div>
             </div>
