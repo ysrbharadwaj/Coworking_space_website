@@ -1,18 +1,18 @@
-# 🎯 YOUR CONTRIBUTIONS EXPLAINED - Complete Code Guide
+# YOUR CONTRIBUTIONS EXPLAINED - Complete Code Guide
 
 ---
 
-## 📋 TABLE OF CONTENTS
+## TABLE OF CONTENTS
 
 1. **Admin Dashboard JS Files** (First 10)
 2. **Admin Frontend HTML Files** (First 10)
 3. **Backend Routes** (bookings.js, pricing.js, ratings.js)
-4. **Dynamic Pricing Engine** ⭐
+4. **Dynamic Pricing Engine**
 5. **Data Scraping / Migration** 
 
 ---
 
-## 🎨 PART 1: ADMIN DASHBOARD JS FILES (FIRST 10)
+## PART 1: ADMIN DASHBOARD JS FILES (FIRST 10)
 
 ### 1. `admin-dashboard.js` - Main Admin Home
 
@@ -817,7 +817,7 @@ function renderResources(resources) {
 
 ---
 
-## 🌐 PART 2: ADMIN HTML FILES (FIRST 10)
+## PART 2: ADMIN HTML FILES (FIRST 10)
 
 Your 10 HTML files are the UI templates that work with the JS files above:
 
@@ -834,9 +834,9 @@ Your 10 HTML files are the UI templates that work with the JS files above:
 
 ---
 
-## 🚀 PART 3: BACKEND ROUTES
+## PART 3: BACKEND ROUTES
 
-### **`bookings.js` - ⭐ Main Booking Logic**
+### **`bookings.js` - Main Booking Logic**
 
 **Main Endpoint:** `POST /api/bookings` (Create booking)
 
@@ -1253,7 +1253,7 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
 
 ---
 
-## ⭐ PART 4: DYNAMIC PRICING ENGINE
+## PART 4: DYNAMIC PRICING ENGINE
 
 ### **`pricing.js` (Backend Utility) - The STAR Feature**
 
@@ -1289,7 +1289,7 @@ async function calculateDynamicPrice(workspace_id, base_price, start_time, end_t
 
     // ═════════════════════════════════════════════════════════════════
     // MODIFIER 1: WORKDAY PRICING (+8% Monday-Friday)
-    // ═════════════════════════════════════════════════════════════════
+    // =====================================================
     const dayOfWeek = start.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
     const isWorkday = dayOfWeek >= 1 && dayOfWeek <= 5;
 
@@ -1301,9 +1301,9 @@ async function calculateDynamicPrice(workspace_id, base_price, start_time, end_t
 
     console.log(`📅 Workday Pricing: ${isWorkday ? 'YES +8%' : 'NO (Weekend)'}`);
 
-    // ═════════════════════════════════════════════════════════════════
+    // =====================================================
     // MODIFIER 2: OCCUPANCY-BASED PRICING (+5% if >70% booked)
-    // ═════════════════════════════════════════════════════════════════
+    // =====================================================
     // Get hub_id for this workspace
     const { data: workspace } = await supabase
       .from('workspaces')
@@ -1340,9 +1340,9 @@ async function calculateDynamicPrice(workspace_id, base_price, start_time, end_t
 
     console.log(`🏢 Occupancy Rate: ${occupancyRate.toFixed(1)}% (${bookedWorkspaces}/${totalWorkspaces})`);
 
-    // ═════════════════════════════════════════════════════════════════
+    // =====================================================
     // MODIFIER 3: RATING-BASED PRICING (+5% for ≥4.0 stars)
-    // ═════════════════════════════════════════════════════════════════
+    // =====================================================
     const { data: ratings } = await supabase
       .from('ratings')
       .select('rating')
@@ -1358,12 +1358,12 @@ async function calculateDynamicPrice(workspace_id, base_price, start_time, end_t
       }
 
       priceModifiers.average_rating = Math.round(avgRating * 10) / 10;
-      console.log(`⭐ Average Rating: ${avgRating.toFixed(1)} stars`);
+      console.log(`Average Rating: ${avgRating.toFixed(1)} stars`);
     }
 
-    // ═════════════════════════════════════════════════════════════════
+    // =====================================================
     // APPLY CUSTOM PRICING RULES FROM DATABASE
-    // ═════════════════════════════════════════════════════════════════
+    // =====================================================
     const { data: rules } = await supabase
       .from('pricing_rules')
       .select('*')
@@ -1428,24 +1428,24 @@ async function calculateDynamicPrice(workspace_id, base_price, start_time, end_t
           reasons: reasons.join(', ')
         });
 
-        console.log(`✅ Applied rule: ${rule.rule_type} | Adjustment: ₹${adjustment.toFixed(2)}`);
+        console.log(`Applied rule: ${rule.rule_type} | Adjustment: ₹${adjustment.toFixed(2)}`);
       } else {
-        console.log(`❌ Skipped rule: ${rule.rule_type} | ${reasons.join(', ')}`);
+        console.log(`Skipped rule: ${rule.rule_type} | ${reasons.join(', ')}`);
       }
     }
 
     priceModifiers.appliedRules = appliedRules;
     priceModifiers.total = Math.round(calculatedPrice * 100) / 100;
 
-    console.log('═══════════════════════════════════════════');
+    console.log('===============================================');
     console.log('FINAL PRICE BREAKDOWN:');
     console.log(`  Base Price:       ₹${priceModifiers.base.toFixed(2)}`);
     console.log(`  Workday (+8%):    ₹${priceModifiers.workday.toFixed(2)}`);
     console.log(`  Occupancy (+5%):  ₹${priceModifiers.occupancy.toFixed(2)}`);
     console.log(`  Rating (+5%):     ₹${priceModifiers.rating.toFixed(2)}`);
-    console.log(`  ─────────────────────────────`);
+    console.log(`  -----------------------------------------------`);
     console.log(`  TOTAL PRICE:      ₹${priceModifiers.total.toFixed(2)}`);
-    console.log('═══════════════════════════════════════════');
+    console.log('===============================================');
 
     return {
       finalPrice: priceModifiers.total,
@@ -1479,20 +1479,20 @@ Booking: Monday, 10:00 AM
 Hub Occupancy: 75% (4/5 workspaces booked)
 Workspace Rating: 4.3 stars
 
-═══════════════════════════════════════════
+===============================================
 FINAL PRICE BREAKDOWN:
   Base Price:       ₹100.00
-  Workday (+8%):    ₹8.00    ✅ Monday
-  Occupancy (+5%):  ₹5.54    ✅ 75% booked
-  Rating (+5%):     ₹5.77    ✅ 4.3 stars
-  ─────────────────────────────
+  Workday (+8%):    ₹8.00    [YES] Monday
+  Occupancy (+5%):  ₹5.54    [YES] 75% booked
+  Rating (+5%):     ₹5.77    [YES] 4.3 stars
+  -----------------------------------------------
   TOTAL PRICE:      ₹119.31
-═══════════════════════════════════════════
+===============================================
 ```
 
 ---
 
-## 📊 PART 5: DATA SCRAPING / MIGRATION
+## PART 5: DATA SCRAPING / MIGRATION
 
 ### **`populate-real-data.js` - CSV Data Migration Script**
 
@@ -1524,9 +1524,9 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const supabase = createClient(process.env.PROJECT_URL, process.env.API_KEY);
 const CSV_PATH = path.resolve(__dirname, '../../data/coworking_india_v2.csv');
 
-// ═══════════════════════════════════════════════════════════════════════
+// =====================================================================
 // PARSE CSV - FULL PARSER (Handles quoted fields with embedded newlines)
-// ═══════════════════════════════════════════════════════════════════════
+// =====================================================================
 function parseCSV(content) {
   const rows = [];
   let inQuotes = false;
@@ -1574,10 +1574,10 @@ function parseCSV(content) {
   return rows;
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// =====================================================================
 // PARSE ROOM INFO - Extract pricing from string
 // "12 Rooms | ₹350/hr | ₹2,500/day | ₹28,000/mo"
-// ═══════════════════════════════════════════════════════════════════════
+// =====================================================================
 function parseRoomInfo(str) {
   if (!str || !str.trim()) return null;
   
@@ -1646,8 +1646,8 @@ const CITY_BASE_COORDS = {
 // MAIN MIGRATION FUNCTION
 // ═══════════════════════════════════════════════════════════════════════
 async function main() {
-  console.log('\n🚀  Co-working India — Real Data Migration');
-  console.log('─'.repeat(52));
+  console.log('\nCo-working India — Real Data Migration');
+  console.log('-'.repeat(52));
 
   // 1. READ & PARSE CSV
   if (!fs.existsSync(CSV_PATH)) {
@@ -1676,7 +1676,7 @@ async function main() {
   console.log(`\n📄  Parsed ${dataRows.length} coworking spaces from CSV\n`);
 
   // 2. CLEAR EXISTING DATA (Foreign Key Safe Order)
-  console.log('🗑️   Clearing existing data…');
+  console.log('Clearing existing data...');
   await supabase.from('booking_holds').delete().neq('id', -1);
   await supabase.from('booking_waitlist').delete().neq('id', -1);
   await supabase.from('bookings').delete().neq('id', -1);
@@ -1685,10 +1685,10 @@ async function main() {
   await supabase.from('resources').delete().neq('id', -1);
   await supabase.from('workspaces').delete().neq('id', -1);
   await supabase.from('working_hubs').delete().neq('id', -1);
-  console.log('  ✅  Tables cleared\n');
+  console.log('  OK  Tables cleared\n');
 
   // 3. INSERT WORKING HUBS
-  console.log('📍  Inserting working hubs…');
+  console.log('Inserting working hubs...');
   const hubRows = dataRows.map(row => {
     const [baseLat, baseLng] = CITY_BASE_COORDS[row.city] || [20.5937, 78.9629];
     // Deterministic spread for each hub within city
@@ -1708,10 +1708,10 @@ async function main() {
   });
 
   const hubs = await batchInsert('working_hubs', hubRows);
-  console.log(`  ✅  ${hubs.length} hubs inserted\n`);
+  console.log(`  OK  ${hubs.length} hubs inserted\n`);
 
   // 4. INSERT WORKSPACES
-  console.log('💼  Inserting workspaces…');
+  console.log('Inserting workspaces...');
   const wsMeta = [];
   const wsRows = [];
 
@@ -1750,10 +1750,10 @@ async function main() {
   }
 
   const workspaces = await batchInsert('workspaces', wsRows);
-  console.log(`  ✅  ${workspaces.length} workspaces inserted\n`);
+  console.log(`  OK  ${workspaces.length} workspaces inserted\n`);
 
   // 5. INSERT RESOURCES
-  console.log('🎯  Inserting resources…');
+  console.log('Inserting resources...');
   const resources = [];
   const wsLookup = {};
   
@@ -1787,10 +1787,10 @@ async function main() {
   }
 
   const insertedResources = await batchInsert('resources', resources, 100, 'id');
-  console.log(`  ✅  ${insertedResources.length} resources inserted\n`);
+  console.log(`  OK  ${insertedResources.length} resources inserted\n`);
 
   // 6. INSERT PRICING RULES
-  console.log('💰  Inserting pricing rules…');
+  console.log('Inserting pricing rules...');
   const pricingRules = [];
   const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
   const WEEKEND = ['Sat', 'Sun'];
@@ -1831,10 +1831,10 @@ async function main() {
   }
 
   const insertedRules = await batchInsert('pricing_rules', pricingRules, 100, 'id');
-  console.log(`  ✅  ${insertedRules.length} pricing rules inserted\n`);
+  console.log(`  OK  ${insertedRules.length} pricing rules inserted\n`);
 
   // 7. INSERT SAMPLE RATINGS
-  console.log('⭐  Inserting ratings…');
+  console.log('Inserting ratings...');
   const ratings = [];
   const SAMPLE_REVIEWS = {
     hotdesk: [
@@ -1866,23 +1866,23 @@ async function main() {
   }
 
   const insertedRatings = await batchInsert('ratings', ratings, 100, 'id');
-  console.log(`  ✅  ${insertedRatings.length} ratings inserted\n`);
+  console.log(`  OK  ${insertedRatings.length} ratings inserted\n`);
 
   // SUMMARY
-  console.log('🎉  Migration complete!\n');
-  console.log(`  📍  ${String(hubs.length).padStart(4)}  working hubs`);
-  console.log(`  💼  ${String(workspaces.length).padStart(4)}  workspaces`);
-  console.log(`  🎯  ${String(insertedResources.length).padStart(4)}  resources`);
-  console.log(`  💰  ${String(insertedRules.length).padStart(4)}  pricing rules`);
-  console.log(`  ⭐  ${String(insertedRatings.length).padStart(4)}  ratings\n`);
+  console.log('Migration complete!\n');
+  console.log(`  ${String(hubs.length).padStart(4)}  working hubs`);
+  console.log(`  ${String(workspaces.length).padStart(4)}  workspaces`);
+  console.log(`  ${String(insertedResources.length).padStart(4)}  resources`);
+  console.log(`  ${String(insertedRules.length).padStart(4)}  pricing rules`);
+  console.log(`  ${String(insertedRatings.length).padStart(4)}  ratings\n`);
 
   const cities = [...new Set(dataRows.map(r => r.city))];
   console.log(`  Cities: ${cities.join(', ')}`);
-  console.log('─'.repeat(52) + '\n');
+  console.log('-'.repeat(52) + '\n');
 }
 
 main().catch(err => {
-  console.error('\n❌  Fatal error:', err.message);
+  console.error('\nFatal error:', err.message);
   if (err.detail) console.error('   Detail:', JSON.stringify(err.detail, null, 2));
   process.exit(1);
 });
@@ -1891,27 +1891,35 @@ main().catch(err => {
 **Data Flow:**
 ```
 CSV File (data/coworking_india_v2.csv)
-    ↓
+    |
+    v
 parseCSV() - Parse with quoted field support
-    ↓
+    |
+    v
 parseRoomInfo() - Extract pricing from strings
-    ↓
-Build hub rows → batchInsert('working_hubs')
-    ↓
-Build workspace rows → batchInsert('workspaces')
-    ↓
-Build resources → batchInsert('resources')
-    ↓
-Build pricing rules → batchInsert('pricing_rules')
-    ↓
-Build ratings → batchInsert('ratings')
-    ↓
-Database populated ✅
+    |
+    v
+Build hub rows -> batchInsert('working_hubs')
+    |
+    v
+Build workspace rows -> batchInsert('workspaces')
+    |
+    v
+Build resources -> batchInsert('resources')
+    |
+    v
+Build pricing rules -> batchInsert('pricing_rules')
+    |
+    v
+Build ratings -> batchInsert('ratings')
+    |
+    v
+Database populated [OK]
 ```
 
 ---
 
-## 📝 SUMMARY TABLE
+## SUMMARY TABLE
 
 | File | Main Function | Purpose |
 |------|---------------|---------|
@@ -1928,31 +1936,31 @@ Database populated ✅
 | **bookings.js** (route) | `POST /bookings` | Create booking + pricing |
 | **pricing.js** (route) | `POST /pricing` | Create pricing rules |
 | **ratings.js** (route) | `POST /ratings/:id` | Add reviews |
-| **pricing.js** (util) | `calculateDynamicPrice()` | ⭐ Smart pricing |
-| **populate-real-data.js** | `main()` | 📊 Data migration |
+| **pricing.js** (util) | `calculateDynamicPrice()` | Smart pricing |
+| **populate-real-data.js** | `main()` | Data migration |
 
 ---
 
-## 🎓 How to Explain to an Interviewer
+## How to Explain to an Interviewer
 
 **Simple Explanation:**
 
 > "I built the complete admin dashboard system for a coworking space booking platform. 
 > 
-> My **10 frontend JS files** manage the admin UI - showing bookings, hubs, workspaces, pricing rules, and financial reports with auto-refresh every 15 seconds.
+> My 10 frontend JS files manage the admin UI - showing bookings, hubs, workspaces, pricing rules, and financial reports with auto-refresh every 15 seconds.
 > 
-> On the backend, I built **3 main routes**:
-> - **Bookings**: Handle all booking lifecycle with slot locking & waitlist management
-> - **Pricing**: Admin can create dynamic pricing rules
-> - **Ratings**: Customer reviews improve quality metrics
+> On the backend, I built 3 main routes:
+> - Bookings: Handle all booking lifecycle with slot locking & waitlist management
+> - Pricing: Admin can create dynamic pricing rules
+> - Ratings: Customer reviews improve quality metrics
 > 
-> My **star feature** is the **Dynamic Pricing Engine** - it automatically adjusts prices based on:
-> 1. **Workday Pricing** (+8% Mon-Fri)
-> 2. **Occupancy** (+5% if >70% booked)
-> 3. **Quality Rating** (+5% for ≥4 stars)
+> My star feature is the Dynamic Pricing Engine - it automatically adjusts prices based on:
+> 1. Workday Pricing (+8% Mon-Fri)
+> 2. Occupancy (+5% if >70% booked)
+> 3. Quality Rating (+5% for >= 4 stars)
 > 
-> Plus, I built a **data migration script** that scraped real coworking space data from a CSV file and populated our database."
+> Plus, I built a data migration script that scraped real coworking space data from a CSV file and populated our database."
 
 ---
 
-I hope this complete guide helps you explain your contributions clearly! All the main functions, code snippets, and logic flows are here. Good luck! 🚀
+I hope this complete guide helps you explain your contributions clearly! All the main functions, code snippets, and logic flows are here. Good luck!
